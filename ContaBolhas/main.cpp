@@ -5,10 +5,50 @@
 using namespace cv;
 using namespace std;
 
+void myseedfill(Mat image, int cor, stack<CvPoint> pilha){
+    CvPoint coordenada, aux;
+
+    while(!pilha.empty()){
+        coordenada = pilha.top();
+        pilha.pop();
+
+        if(image.at<uchar>(coordenada.x,coordenada.y)==255){
+            //vizinho de esquerda
+            if(coordenada.y-1>=0 && image.at<uchar>(coordenada.x,coordenada.y-1)==255){
+                aux.x=coordenada.x;
+                aux.y=coordenada.y-1;
+                pilha.push(aux);
+            }
+            //vizinho da direita
+            if(coordenada.y+1<=255 && image.at<uchar>(coordenada.x,coordenada.y+1)==255){
+                aux.x=coordenada.x;
+                aux.y=coordenada.y+1;
+                pilha.push(aux);
+            }
+            //vizinho de baixo
+            if(coordenada.x+1<=255 && image.at<uchar>(coordenada.x+1,coordenada.y)==255){
+                aux.x=coordenada.x+1;
+                aux.y=coordenada.y;
+                pilha.push(aux);
+            }
+            //vizinho de cima
+            if(coordenada.x-1>=0 && image.at<uchar>(coordenada.x-1,coordenada.y)==255){
+                aux.x=coordenada.x-1;
+                aux.y=coordenada.y;
+                pilha.push(aux);
+            }
+            image.at<uchar>(coordenada.x,coordenada.y) = cor;
+        }
+    }//fim do while
+    cout<<"Aperte uma tecla!"<<endl;
+    waitKey();
+    imshow("janela", image);
+}
+
 int main(int, char**){
     Mat image;
     stack<CvPoint> pilha;
-    CvPoint coordenada, aux;
+    CvPoint coordenada;
     int cont = 51;
 
     image = imread("bolhas.png",CV_LOAD_IMAGE_GRAYSCALE);
@@ -21,8 +61,8 @@ int main(int, char**){
     imshow("janela", image);
     waitKey();
 
+    //verificando bolhas nas bordas
     for(int i=0;i<256;i++){
-        //verificando bolhas nas bordas
         if(image.at<uchar>(i,0)==255 || image.at<uchar>(i,255)==255 || image.at<uchar>(0,i)==255 || image.at<uchar>(255,i)==255){
             if(image.at<uchar>(i,0)==255 || image.at<uchar>(i,255)==255) { //primeira e ultima coluna
                 coordenada.x = i;
@@ -36,44 +76,15 @@ int main(int, char**){
 
             pilha.push(coordenada);
 
-            while(!pilha.empty()){
-                coordenada = pilha.top();
-                pilha.pop();
+            myseedfill(image, 0, pilha);
 
-                if(image.at<uchar>(coordenada.x,coordenada.y)==255){
-                    //vizinho de esquerda
-                    if(coordenada.y-1>=0 && image.at<uchar>(coordenada.x,coordenada.y-1)==255){
-                        aux.x=coordenada.x;
-                        aux.y=coordenada.y-1;
-                        pilha.push(aux);
-                    }
-                    //vizinho da direita
-                    if(coordenada.y+1<=255 && image.at<uchar>(coordenada.x,coordenada.y+1)==255){
-                        aux.x=coordenada.x;
-                        aux.y=coordenada.y+1;
-                        pilha.push(aux);
-                    }
-                    //vizinho de baixo
-                    if(coordenada.x+1<=255 && image.at<uchar>(coordenada.x+1,coordenada.y)==255){
-                        aux.x=coordenada.x+1;
-                        aux.y=coordenada.y;
-                        pilha.push(aux);
-                    }
-                    //vizinho de cima
-                    if(coordenada.x-1>=0 && image.at<uchar>(coordenada.x-1,coordenada.y)==255){
-                        aux.x=coordenada.x-1;
-                        aux.y=coordenada.y;
-                        pilha.push(aux);
-                    }
-                    image.at<uchar>(coordenada.x,coordenada.y)=0;
-                }
-            }//fim do while
             cout<<"Aperte uma tecla!"<<endl;
             waitKey();
             imshow("janela", image);
         }
     }
 
+    //pinta as bolhas do centro
     for(int l=0;l<256;l++){
         for(int c=0;c<256;c++){
             if(image.at<uchar>(l,c)==255){
@@ -82,38 +93,8 @@ int main(int, char**){
 
                 pilha.push(coordenada);
 
-                while(!pilha.empty()){
-                    coordenada = pilha.top();
-                    pilha.pop();
+                myseedfill(image, cont, pilha);
 
-                    if(image.at<uchar>(coordenada.x,coordenada.y)==255){
-                        //vizinho de esquerda
-                        if(coordenada.y-1>=0 && image.at<uchar>(coordenada.x,coordenada.y-1)==255){
-                            aux.x = coordenada.x;
-                            aux.y = coordenada.y-1;
-                            pilha.push(aux);
-                        }
-                        //vizinho da direita
-                        if(coordenada.y+1<=255 && image.at<uchar>(coordenada.x,coordenada.y+1)==255){
-                            aux.x = coordenada.x;
-                            aux.y = coordenada.y+1;
-                            pilha.push(aux);
-                        }
-                        //vizinho de baixo
-                        if(coordenada.x+1<=255 && image.at<uchar>(coordenada.x+1,coordenada.y)==255){
-                            aux.x = coordenada.x+1;
-                            aux.y = coordenada.y;
-                            pilha.push(aux);
-                        }
-                        //vizinho de cima
-                        if(coordenada.x-1>=0 && image.at<uchar>(coordenada.x-1,coordenada.y)==255){
-                            aux.x = coordenada.x-1;
-                            aux.y = coordenada.y;
-                            pilha.push(aux);
-                        }
-                        image.at<uchar>(coordenada.x,coordenada.y) = cont;
-                    }
-                }//fim do while
                 cont = cont + 1;
                 cout<<"Aperte uma tecla!"<<endl;
                 waitKey();
@@ -121,6 +102,10 @@ int main(int, char**){
             }
         }
     }
+
+    //pinta o fundo
+
+    //conta as bolhas com buraco
 
     cout<<"FIM!"<<endl<<"Tem "<<cont-51<<" bolhas."<<endl;
     waitKey();
