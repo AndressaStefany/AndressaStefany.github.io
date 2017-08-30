@@ -12,31 +12,31 @@ void myseedfill(Mat image, int cor, int searchcor, stack<CvPoint> pilha){
         coordenada = pilha.top();
         pilha.pop();
 
-            //vizinho de esquerda
-            if(coordenada.y-1>=0 && image.at<uchar>(coordenada.x,coordenada.y-1)==searchcor){
-                aux.x=coordenada.x;
-                aux.y=coordenada.y-1;
-                pilha.push(aux);
-            }
-            //vizinho da direita
-            if(coordenada.y+1<image.size().width && image.at<uchar>(coordenada.x,coordenada.y+1)==searchcor){
-                aux.x=coordenada.x;
-                aux.y=coordenada.y+1;
-                pilha.push(aux);
-            }
-            //vizinho de baixo
-            if(coordenada.x+1<image.size().height && image.at<uchar>(coordenada.x+1,coordenada.y)==searchcor){
-                aux.x=coordenada.x+1;
-                aux.y=coordenada.y;
-                pilha.push(aux);
-            }
-            //vizinho de cima
-            if(coordenada.x-1>=0 && image.at<uchar>(coordenada.x-1,coordenada.y)==searchcor){
-                aux.x=coordenada.x-1;
-                aux.y=coordenada.y;
-                pilha.push(aux);
-            }
-            image.at<uchar>(coordenada.x,coordenada.y) = cor;
+        //vizinho de esquerda
+        if(coordenada.y-1>=0 && image.at<uchar>(coordenada.x,coordenada.y-1)==searchcor){
+            aux.x=coordenada.x;
+            aux.y=coordenada.y-1;
+            pilha.push(aux);
+        }
+        //vizinho da direita
+        if(coordenada.y+1<image.size().width && image.at<uchar>(coordenada.x,coordenada.y+1)==searchcor){
+            aux.x=coordenada.x;
+            aux.y=coordenada.y+1;
+            pilha.push(aux);
+        }
+        //vizinho de baixo
+        if(coordenada.x+1<image.size().height && image.at<uchar>(coordenada.x+1,coordenada.y)==searchcor){
+            aux.x=coordenada.x+1;
+            aux.y=coordenada.y;
+            pilha.push(aux);
+        }
+        //vizinho de cima
+        if(coordenada.x-1>=0 && image.at<uchar>(coordenada.x-1,coordenada.y)==searchcor){
+            aux.x=coordenada.x-1;
+            aux.y=coordenada.y;
+            pilha.push(aux);
+        }
+        image.at<uchar>(coordenada.x,coordenada.y) = cor;
 
     }//fim do while
 }
@@ -47,7 +47,7 @@ int main(int, char**){
     CvPoint coordenada;
     int cont = 50, buracos = 0, total, width, height;
 
-    image = imread("bolhas.png",CV_LOAD_IMAGE_GRAYSCALE);
+    image = imread("../images/bolhas.png",CV_LOAD_IMAGE_GRAYSCALE);
     width = image.size().width;
     height = image.size().height;
 
@@ -118,10 +118,9 @@ int main(int, char**){
                 coordenada.x = l;
                 coordenada.y = c;
 
-                pilha.push(coordenada);
-
                 buracos++;
 
+                pilha.push(coordenada);
                 myseedfill(image, buracos, 0, pilha);
             }
         }
