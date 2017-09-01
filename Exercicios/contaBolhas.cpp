@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stack>
+#include <list>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -44,8 +45,9 @@ void myseedfill(Mat image, int cor, int searchcor, stack<CvPoint> pilha){
 int main(int, char**){
     Mat image;
     stack<CvPoint> pilha;
-    CvPoint coordenada;
-    int cont = 50, buracos = 0, total, width, height;
+    list<int> listaCor;
+    CvPoint coordenada, auxiliar;
+    int cont = 50, buracos = 0, total, width, height, tamLista, ajud=0;
 
     image = imread("../images/bolhas.png",CV_LOAD_IMAGE_GRAYSCALE);
     width = image.size().width;
@@ -114,20 +116,34 @@ int main(int, char**){
     //conta as bolhas com buraco
     for(int l=0;l<height;l++){
         for(int c=0;c<width;c++){
-            if(image.at<uchar>(l,c)==0){
+
+            if(image.at<uchar>(l,c)==0){//procura o preto
+                tamLista = listaCor.size();
+                for(int i=0; i<=listaCor.size(); i++) {
+                    //primeira confere, se não existe, coloca em listaCor e conta um buraco
+//                    if(image.at<uchar>(l,c) == next(listaCor.begin, i)){
+                        cout << listaCor.next<<endl;
+//                    }
+                }
+                int teste = image.at<uchar>(l,c-1);
+                cout<<"testando "<<teste<<endl;
+                listaCor.push_front(teste);
+                buracos++;
+
                 coordenada.x = l;
                 coordenada.y = c;
 
-                buracos++;
-
                 pilha.push(coordenada);
+
                 myseedfill(image, buracos, 0, pilha);
             }
         }
     }
 
 
-    cout<<endl<<endl<<"Tem "<<buracos<<" bolhas com buracos e "<<total-buracos<<" bolhas sem buracos."<<endl<<endl<<"FIM!"<<endl;
+    cout<<endl<<endl<<"Tem o total de "<<total<<endl<<"Sendo: "
+        <<buracos<<" bolhas com buracos e "<<total-buracos<<" bolhas sem buracos."
+        <<endl<<endl<<"FIM!"<<endl;
     waitKey();
 
     return 0;
