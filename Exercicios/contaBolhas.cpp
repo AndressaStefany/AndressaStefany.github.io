@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stack>
 #include <list>
+#include <vector>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -45,9 +46,8 @@ void myseedfill(Mat image, int cor, int searchcor, stack<CvPoint> pilha){
 int main(int, char**){
     Mat image;
     stack<CvPoint> pilha;
-    list<int> listaCor;
-    CvPoint coordenada, auxiliar;
-    int cont = 50, buracos = 0, total, width, height, tamLista, ajud=0;
+    CvPoint coordenada;
+    int cont = 50, buracos = 0, total, width, height;
 
     image = imread("../images/bolhas.png",CV_LOAD_IMAGE_GRAYSCALE);
     width = image.size().width;
@@ -56,12 +56,14 @@ int main(int, char**){
     if(!image.data)
         cout << "nao abriu bolhas.png" << endl;
 
-    namedWindow("janela",WINDOW_AUTOSIZE);
-    imshow("janela", image);
+    namedWindow("janela1",WINDOW_AUTOSIZE);
+    imshow("janela1", image);
 
     //verificando bolhas nas bordas
     for(int i=0;i<width;i++){
-        if(image.at<uchar>(i,0)==255 || image.at<uchar>(i,height-1)==255 || image.at<uchar>(0,i)==255 || image.at<uchar>(width-1,i)==255){
+        if(image.at<uchar>(i,0)==255 || image.at<uchar>(i,height-1)==255 || image.at<uchar>(0,i)==255
+           || image.at<uchar>(width-1,i)==255){
+
             if(image.at<uchar>(i,0)==255 || image.at<uchar>(i,height-1)==255) { //primeira e ultima coluna
                 coordenada.x = i;
                 coordenada.y = (image.at<uchar>(i, 0) == 255) ? 0 : height-1;
@@ -75,11 +77,12 @@ int main(int, char**){
             pilha.push(coordenada);
 
             myseedfill(image, 0, 255, pilha);
-
-            waitKey();
-            imshow("janela", image);
         }
     }
+
+    waitKey();
+    namedWindow("janela2",WINDOW_AUTOSIZE);
+    imshow("janela2", image);
 
     //pinta as bolhas do centro
     for(int l=0;l<height;l++){
@@ -90,15 +93,16 @@ int main(int, char**){
 
                 pilha.push(coordenada);
 
-                cont = cont + 1;
+                cont++;
 
-                myseedfill(image, cont, 255, pilha);
-
-                waitKey();
-                imshow("janela", image);
+                myseedfill(image, 200, 255, pilha);
             }
         }
     }
+
+    waitKey();
+    namedWindow("janela3",WINDOW_AUTOSIZE);
+    imshow("janela3", image);
 
     total = cont-50;
 
@@ -111,37 +115,34 @@ int main(int, char**){
     myseedfill(image, 255, 0, pilha);
 
     waitKey();
-    imshow("janela", image);
+    namedWindow("janela4",WINDOW_AUTOSIZE);
+    imshow("janela4", image);
 
     //conta as bolhas com buraco
     for(int l=0;l<height;l++){
         for(int c=0;c<width;c++){
 
-            if(image.at<uchar>(l,c)==0){//procura o preto
-                tamLista = listaCor.size();
-                for(int i=0; i<=listaCor.size(); i++) {
-                    //primeira confere, se não existe, coloca em listaCor e conta um buraco
-//                    if(image.at<uchar>(l,c) == next(listaCor.begin, i)){
-                        cout << listaCor.next<<endl;
-//                    }
-                }
-                int teste = image.at<uchar>(l,c-1);
-                cout<<"testando "<<teste<<endl;
-                listaCor.push_front(teste);
-                buracos++;
+            if(image.at<uchar>(l,c)==0) {//procura o preto
 
                 coordenada.x = l;
                 coordenada.y = c;
 
                 pilha.push(coordenada);
 
-                myseedfill(image, buracos, 0, pilha);
+                myseedfill(image, 50, 0, pilha);
+
+                //eh uma nova bolha?
+                if(image.at<uchar>(l, c-1) == 200){
+                    buracos++;
+                    myseedfill(image, 100, 0, pilha);
+                }
+
             }
         }
     }
 
 
-    cout<<endl<<endl<<"Tem o total de "<<total<<endl<<"Sendo: "
+    cout<<endl<<endl<<"Tem o total de "<<total<<" bolhas."<<endl<<"Sendo "
         <<buracos<<" bolhas com buracos e "<<total-buracos<<" bolhas sem buracos."
         <<endl<<endl<<"FIM!"<<endl;
     waitKey();
