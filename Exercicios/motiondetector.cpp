@@ -44,6 +44,7 @@ int main(int argc, char** argv){
         normalize(histR, histR, 0, histImgR.rows, NORM_MINMAX, -1, Mat());
 
         //verifica histRef e compara os histogramas
+        //utilizando o metodo Chi-Square
         if(histRef.data && compareHist(histR, histRef, CV_COMP_CHISQR)>100){
             cout<<"Ha algo estranho!"<<endl;
         }
