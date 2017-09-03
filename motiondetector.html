@@ -1,0 +1,71 @@
+<pre><span class="pre">#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+</span><span class="keyword">
+using namespace</span> cv<span class="operator">;</span><span class="keyword">
+using namespace</span> std<span class="operator">;</span><span class="type">
+
+int</span><span class="keyword"> main</span><span class="operator">(</span><span class="type">int</span> argc<span class="operator">,</span><span class="type"> char</span><span class="operator">**</span> argv<span class="operator">){</span>
+    Mat imageAnt<span class="operator">,</span> image<span class="operator">;</span><span class="type">
+    int</span> width<span class="operator">,</span> height<span class="operator">;</span>
+    VideoCapture cap<span class="operator">;</span><span class="comment"> //pegar as imagens
+</span>    vector<span class="operator">&lt;</span>Mat<span class="operator">&gt;</span> planes<span class="operator">;</span><span class="comment"> //armazenar as componentes
+</span>    Mat histR<span class="operator">,</span> histRef<span class="operator">;</span><span class="comment"> //guardar os histogramas
+</span><span class="type">    int</span> nbins<span class="operator"> =</span><span class="int"> 64</span><span class="operator">;</span><span class="comment"> //tamanho do vetor utilizado para armazenar os histogramas
+</span><span class="type">    float</span> range<span class="operator">[] = {</span><span class="int">0</span><span class="operator">,</span><span class="int"> 256</span><span class="operator">};</span><span class="keyword">
+    const</span><span class="type"> float</span><span class="operator"> *</span>histrange<span class="operator"> = {</span> range<span class="operator"> };</span><span class="type">
+    bool</span> uniform<span class="operator"> =</span><span class="bool"> true</span><span class="operator">;</span><span class="type">
+    bool</span> acummulate<span class="operator"> =</span><span class="bool"> false</span><span class="operator">;</span>
+
+    cap<span class="operator">.</span>open<span class="operator">(</span><span class="int">0</span><span class="operator">);</span><span class="comment"> //abre a conexao
+</span><span class="flow">
+    if</span><span class="operator">(!</span>cap<span class="operator">.</span>isOpened<span class="operator">()){</span>
+        cout<span class="operator"> &lt;&lt;</span><span class="string"> "cameras indisponiveis"</span><span class="operator">;</span><span class="flow">
+        return</span><span class="operator"> -</span><span class="int">1</span><span class="operator">;
+    }</span>
+
+    width<span class="operator">  =</span> cap<span class="operator">.</span>get<span class="operator">(</span>CV_CAP_PROP_FRAME_WIDTH<span class="operator">);</span>
+    height<span class="operator"> =</span> cap<span class="operator">.</span>get<span class="operator">(</span>CV_CAP_PROP_FRAME_HEIGHT<span class="operator">);</span>
+
+    cout<span class="operator"> &lt;&lt;</span><span class="string"> "largura = "</span><span class="operator"> &lt;&lt;</span> width<span class="operator"> &lt;&lt;</span> endl<span class="operator">;</span>
+    cout<span class="operator"> &lt;&lt;</span><span class="string"> "altura  = "</span><span class="operator"> &lt;&lt;</span> height<span class="operator"> &lt;&lt;</span> endl<span class="operator">;</span><span class="type">
+
+    int</span> histw<span class="operator"> =</span> nbins<span class="operator">,</span> histh<span class="operator"> =</span> nbins<span class="operator">/</span><span class="int">2</span><span class="operator">;</span>
+    Mat histImgR<span class="operator">(</span>histh<span class="operator">,</span> histw<span class="operator">,</span> CV_8UC3<span class="operator">,</span> Scalar<span class="operator">(</span><span class="int">0</span><span class="operator">,</span><span class="int">0</span><span class="operator">,</span><span class="int">0</span><span class="operator">));</span><span class="flow">
+
+    while</span><span class="operator">(</span><span class="int">1</span><span class="operator">){</span>
+        cap<span class="operator"> &gt;&gt;</span> image<span class="operator">;</span><span class="comment"> //captura a imagem
+</span>        split<span class="operator"> (</span>image<span class="operator">,</span> planes<span class="operator">);</span><span class="comment">//separa os planos
+
+        //o histograma e calculado
+</span>        calcHist<span class="operator">(&amp;</span>planes<span class="operator">[</span><span class="int">0</span><span class="operator">],</span><span class="int"> 1</span><span class="operator">,</span><span class="int"> 0</span><span class="operator">,</span> Mat<span class="operator">(),</span> histR<span class="operator">,</span><span class="int"> 1</span><span class="operator">,
+                 &amp;</span>nbins<span class="operator">, &amp;</span>histrange<span class="operator">,</span>
+                 uniform<span class="operator">,</span> acummulate<span class="operator">);</span><span class="comment">
+        //normalizaçao
+</span>        normalize<span class="operator">(</span>histR<span class="operator">,</span> histR<span class="operator">,</span><span class="int"> 0</span><span class="operator">,</span> histImgR<span class="operator">.</span>rows<span class="operator">,</span> NORM_MINMAX<span class="operator">, -</span><span class="int">1</span><span class="operator">,</span> Mat<span class="operator">());</span><span class="comment">
+
+        //verifica histRef e compara os histogramas
+        //utilizando o metodo Chi-Square
+</span><span class="flow">        if</span><span class="operator">(</span>histRef<span class="operator">.</span>data<span class="operator"> &amp;&amp;</span> compareHist<span class="operator">(</span>histR<span class="operator">,</span> histRef<span class="operator">,</span> CV_COMP_CHISQR<span class="operator">)&gt;</span><span class="int">50</span><span class="operator">){</span>
+            putText<span class="operator">(</span>image<span class="operator">,</span><span class="string"> "MOVIMENTO DETECTADO!"</span><span class="operator">,</span> cvPoint<span class="operator">(</span><span class="int">190</span><span class="operator">,</span><span class="int">250</span><span class="operator">),</span>
+                    CV_FONT_HERSHEY_SIMPLEX<span class="operator">,</span><span class="float"> 0.8</span><span class="operator">,</span> cvScalar<span class="operator">(</span><span class="int">0</span><span class="operator">,</span><span class="int">0</span><span class="operator">,</span><span class="int">255</span><span class="operator">),</span><span class="int"> 1</span><span class="operator">,</span> CV_AA<span class="operator">);
+        }</span>
+
+        histImgR<span class="operator">.</span>setTo<span class="operator">(</span>Scalar<span class="operator">(</span><span class="int">0</span><span class="operator">));</span><span class="flow">
+
+        for</span><span class="operator">(</span><span class="type">int</span> i<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> i<span class="operator">&lt;</span>nbins<span class="operator">;</span> i<span class="operator">++){</span><span class="comment">//gera o desenho o histograma
+</span>            line<span class="operator">(</span>histImgR<span class="operator">,</span>
+                 Point<span class="operator">(</span>i<span class="operator">,</span> histh<span class="operator">),</span>
+                 Point<span class="operator">(</span>i<span class="operator">,</span> histh<span class="operator">-</span>cvRound<span class="operator">(</span>histR<span class="operator">.</span>at<span class="operator">&lt;</span><span class="type">float</span><span class="operator">&gt;(</span>i<span class="operator">))),</span>
+                 Scalar<span class="operator">(</span><span class="int">0</span><span class="operator">,</span><span class="int"> 0</span><span class="operator">,</span><span class="int"> 255</span><span class="operator">),</span><span class="int"> 1</span><span class="operator">,</span><span class="int"> 8</span><span class="operator">,</span><span class="int"> 0</span><span class="operator">);
+        }</span><span class="comment">
+        //imagen do histograma e copiada para a imagem
+</span>        histImgR<span class="operator">.</span>copyTo<span class="operator">(</span>image<span class="operator">(</span>Rect<span class="operator">(</span><span class="int">0</span><span class="operator">,</span><span class="int"> 0</span><span class="operator">,</span>nbins<span class="operator">,</span> histh<span class="operator">)));</span>
+
+        histRef<span class="operator"> =</span> histR<span class="operator">.</span>clone<span class="operator">();</span><span class="comment"> //guarda o ultimo histograma
+</span>
+        imshow<span class="operator">(</span><span class="string">"image"</span><span class="operator">,</span> image<span class="operator">);</span><span class="flow">
+        if</span><span class="operator">(</span>waitKey<span class="operator">(</span><span class="int">30</span><span class="operator">) &gt;=</span><span class="int"> 0</span><span class="operator">)</span><span class="flow"> break</span><span class="operator">;
+    }</span><span class="flow">
+    return</span><span class="int"> 0</span><span class="operator">;
+}</span>
+</pre>

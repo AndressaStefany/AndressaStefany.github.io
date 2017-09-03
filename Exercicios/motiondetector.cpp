@@ -45,8 +45,9 @@ int main(int argc, char** argv){
 
         //verifica histRef e compara os histogramas
         //utilizando o metodo Chi-Square
-        if(histRef.data && compareHist(histR, histRef, CV_COMP_CHISQR)>100){
-            cout<<"Ha algo estranho!"<<endl;
+        if(histRef.data && compareHist(histR, histRef, CV_COMP_CHISQR)>50){
+            putText(image, "MOVIMENTO DETECTADO!", cvPoint(190,250),
+                    CV_FONT_HERSHEY_SIMPLEX, 0.8, cvScalar(0,0,255), 1, CV_AA);
         }
 
         histImgR.setTo(Scalar(0));
