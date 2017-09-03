@@ -1,0 +1,142 @@
+<pre><span class="pre">#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+</span><span class="keyword">
+using namespace</span> cv<span class="operator">;</span><span class="keyword">
+using namespace</span> std<span class="operator">;</span><span class="type">
+
+void</span> printmask<span class="operator">(</span>Mat<span class="operator"> &amp;</span>m<span class="operator">){</span><span class="flow">
+    for</span><span class="operator">(</span><span class="type">int</span> i<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> i<span class="operator">&lt;</span>m<span class="operator">.</span>size<span class="operator">().</span>height<span class="operator">;</span> i<span class="operator">++){</span><span class="flow">
+        for</span><span class="operator">(</span><span class="type">int</span> j<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> j<span class="operator">&lt;</span>m<span class="operator">.</span>size<span class="operator">().</span>width<span class="operator">;</span> j<span class="operator">++){</span>
+            cout<span class="operator"> &lt;&lt;</span> m<span class="operator">.</span>at<span class="operator">&lt;</span><span class="type">float</span><span class="operator">&gt;(</span>i<span class="operator">,</span>j<span class="operator">) &lt;&lt;</span><span class="string"> ","</span><span class="operator">;
+        }</span>
+        cout<span class="operator"> &lt;&lt;</span> endl<span class="operator">;
+    }
+}</span><span class="type">
+
+void</span> menu<span class="operator">(){</span>
+    cout<span class="operator"> &lt;&lt;</span><span class="string"> "\npressione a tecla para ativar o filtro: \n"
+            "a - calcular modulo\n"
+            "m - media\n"
+            "g - gauss\n"
+            "v - vertical\n"
+            "h - horizontal\n"
+            "l - laplaciano\n"
+            "lapGau - laplaciando do gaussiano"
+            "esc - sair\n"</span><span class="operator">;
+}</span><span class="type">
+
+int</span><span class="keyword"> main</span><span class="operator">(</span><span class="type">int</span> argvc<span class="operator">,</span><span class="type"> char</span><span class="operator">**</span> argv<span class="operator">){</span>
+    VideoCapture video<span class="operator">;</span><span class="type">
+    float</span> media<span class="operator">[] = {</span><span class="int">1</span><span class="operator">,</span><span class="int">1</span><span class="operator">,</span><span class="int">1</span><span class="operator">,</span><span class="int">
+                     1</span><span class="operator">,</span><span class="int">1</span><span class="operator">,</span><span class="int">1</span><span class="operator">,</span><span class="int">
+                     1</span><span class="operator">,</span><span class="int">1</span><span class="operator">,</span><span class="int">1</span><span class="operator">};</span><span class="type">
+    float</span> gauss<span class="operator">[] = {</span><span class="int">1</span><span class="operator">,</span><span class="int">2</span><span class="operator">,</span><span class="int">1</span><span class="operator">,</span><span class="int">
+                     2</span><span class="operator">,</span><span class="int">4</span><span class="operator">,</span><span class="int">2</span><span class="operator">,</span><span class="int">
+                     1</span><span class="operator">,</span><span class="int">2</span><span class="operator">,</span><span class="int">1</span><span class="operator">};</span><span class="type">
+    float</span> horizontal<span class="operator">[]={-</span><span class="int">1</span><span class="operator">,</span><span class="int">0</span><span class="operator">,</span><span class="int">1</span><span class="operator">,
+                        -</span><span class="int">2</span><span class="operator">,</span><span class="int">0</span><span class="operator">,</span><span class="int">2</span><span class="operator">,
+                        -</span><span class="int">1</span><span class="operator">,</span><span class="int">0</span><span class="operator">,</span><span class="int">1</span><span class="operator">};</span><span class="type">
+    float</span> vertical<span class="operator">[]={-</span><span class="int">1</span><span class="operator">,-</span><span class="int">2</span><span class="operator">,-</span><span class="int">1</span><span class="operator">,</span><span class="int">
+                      0</span><span class="operator">,</span><span class="int">0</span><span class="operator">,</span><span class="int">0</span><span class="operator">,</span><span class="int">
+                      1</span><span class="operator">,</span><span class="int">2</span><span class="operator">,</span><span class="int">1</span><span class="operator">};</span><span class="type">
+    float</span> laplacian<span class="operator">[]={</span><span class="int">0</span><span class="operator">,-</span><span class="int">1</span><span class="operator">,</span><span class="int">0</span><span class="operator">,
+                       -</span><span class="int">1</span><span class="operator">,</span><span class="int">4</span><span class="operator">,-</span><span class="int">1</span><span class="operator">,</span><span class="int">
+                       0</span><span class="operator">,-</span><span class="int">1</span><span class="operator">,</span><span class="int">0</span><span class="operator">};</span>
+
+    Mat cap<span class="operator">,</span> frame<span class="operator">,</span> frame32f<span class="operator">,</span> frameMiddle<span class="operator">,</span> frameFiltered<span class="operator">;</span>
+    Mat mask<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int">3</span><span class="operator">,</span>CV_32F<span class="operator">),</span> mask1<span class="operator">;</span>
+    Mat result<span class="operator">,</span> result1<span class="operator">;</span><span class="type">
+    double</span> width<span class="operator">,</span> height<span class="operator">,</span> min<span class="operator">,</span> max<span class="operator">;</span><span class="type">
+    int</span> absolut<span class="operator">;</span><span class="type">
+    char</span> key<span class="operator">;</span><span class="type">
+    bool</span> lapGau<span class="operator"> =</span><span class="bool"> false</span><span class="operator">;</span>
+
+    video<span class="operator">.</span>open<span class="operator">(</span><span class="int">0</span><span class="operator">);</span><span class="flow">
+    if</span><span class="operator">(!</span>video<span class="operator">.</span>isOpened<span class="operator">())</span><span class="flow">
+        return</span><span class="operator"> -</span><span class="int">1</span><span class="operator">;</span>
+    width<span class="operator">=</span>video<span class="operator">.</span>get<span class="operator">(</span>CV_CAP_PROP_FRAME_WIDTH<span class="operator">);</span>
+    height<span class="operator">=</span>video<span class="operator">.</span>get<span class="operator">(</span>CV_CAP_PROP_FRAME_HEIGHT<span class="operator">);</span>
+    std<span class="operator">::</span>cout<span class="operator"> &lt;&lt;</span><span class="string"> "largura="</span><span class="operator"> &lt;&lt;</span> width<span class="operator"> &lt;&lt;</span><span class="string"> "\n"</span><span class="operator">;;</span>
+    std<span class="operator">::</span>cout<span class="operator"> &lt;&lt;</span><span class="string"> "altura ="</span><span class="operator"> &lt;&lt;</span> height<span class="operator">&lt;&lt;</span><span class="string"> "\n"</span><span class="operator">;;</span>
+
+    namedWindow<span class="operator">(</span><span class="string">"filtroespacial"</span><span class="operator">,</span><span class="int">1</span><span class="operator">);</span>
+
+    mask<span class="operator"> =</span> Mat<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int"> 3</span><span class="operator">,</span> CV_32F<span class="operator">,</span> media<span class="operator">);</span>
+    scaleAdd<span class="operator">(</span>mask<span class="operator">,</span><span class="int"> 1</span><span class="operator">/</span><span class="float">9.0</span><span class="operator">,</span> Mat<span class="operator">::</span>zeros<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int">3</span><span class="operator">,</span>CV_32F<span class="operator">),</span> mask1<span class="operator">);</span>
+    swap<span class="operator">(</span>mask<span class="operator">,</span> mask1<span class="operator">);</span>
+    absolut<span class="operator">=</span><span class="int">1</span><span class="operator">;</span><span class="comment"> // calcs abs of the image
+</span>
+    menu<span class="operator">();</span><span class="flow">
+    for</span><span class="operator">(;;){</span>
+        video<span class="operator"> &gt;&gt;</span> cap<span class="operator">;</span>
+        cvtColor<span class="operator">(</span>cap<span class="operator">,</span> frame<span class="operator">,</span> CV_BGR2GRAY<span class="operator">);</span>
+        flip<span class="operator">(</span>frame<span class="operator">,</span> frame<span class="operator">,</span><span class="int"> 1</span><span class="operator">);</span>
+        imshow<span class="operator">(</span><span class="string">"original"</span><span class="operator">,</span> frame<span class="operator">);</span>
+
+        frame<span class="operator">.</span>convertTo<span class="operator">(</span>frame32f<span class="operator">,</span> CV_32F<span class="operator">);</span><span class="flow">
+
+        if</span><span class="operator">(</span>lapGau<span class="operator">){</span>
+            mask<span class="operator"> =</span> Mat<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int"> 3</span><span class="operator">,</span> CV_32F<span class="operator">,</span> gauss<span class="operator">);</span>
+            scaleAdd<span class="operator">(</span>mask<span class="operator">,</span><span class="int"> 1</span><span class="operator">/</span><span class="float">16.0</span><span class="operator">,</span> Mat<span class="operator">::</span>zeros<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int">3</span><span class="operator">,</span>CV_32F<span class="operator">),</span> mask1<span class="operator">);</span>
+            filter2D<span class="operator">(</span>frame32f<span class="operator">,</span> frameMiddle<span class="operator">,</span> frame32f<span class="operator">.</span>depth<span class="operator">(),</span> mask1<span class="operator">,</span> Point<span class="operator">(</span><span class="int">1</span><span class="operator">,</span><span class="int">1</span><span class="operator">),</span><span class="int"> 0</span><span class="operator">);</span>
+
+            mask<span class="operator"> =</span> Mat<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int"> 3</span><span class="operator">,</span> CV_32F<span class="operator">,</span> laplacian<span class="operator">);</span>
+            filter2D<span class="operator">(</span>frameMiddle<span class="operator">,</span> frameFiltered<span class="operator">,</span> frame32f<span class="operator">.</span>depth<span class="operator">(),</span> mask<span class="operator">,</span> Point<span class="operator">(</span><span class="int">1</span><span class="operator">,</span><span class="int">1</span><span class="operator">),</span><span class="int"> 0</span><span class="operator">);
+        }</span><span class="flow"> else</span><span class="operator"> {</span>
+            filter2D<span class="operator">(</span>frame32f<span class="operator">,</span> frameFiltered<span class="operator">,</span> frame32f<span class="operator">.</span>depth<span class="operator">(),</span> mask<span class="operator">,</span> Point<span class="operator">(</span><span class="int">1</span><span class="operator">,</span><span class="int">1</span><span class="operator">),</span><span class="int"> 0</span><span class="operator">);
+        }</span><span class="flow">
+
+        if</span><span class="operator">(</span>absolut<span class="operator">){</span>
+            frameFiltered<span class="operator">=</span>abs<span class="operator">(</span>frameFiltered<span class="operator">);
+        }</span>
+        frameFiltered<span class="operator">.</span>convertTo<span class="operator">(</span>result<span class="operator">,</span> CV_8U<span class="operator">);</span>
+
+
+        imshow<span class="operator">(</span><span class="string">"filtroespacial"</span><span class="operator">,</span> result<span class="operator">);</span>
+        key<span class="operator"> = (</span><span class="type">char</span><span class="operator">)</span> waitKey<span class="operator">(</span><span class="int">10</span><span class="operator">);</span><span class="flow">
+        if</span><span class="operator">(</span> key<span class="operator"> ==</span><span class="int"> 27</span><span class="operator"> )</span><span class="flow"> break</span><span class="operator">;</span><span class="comment"> // esc pressed!
+</span><span class="flow">        switch</span><span class="operator">(</span>key<span class="operator">){</span><span class="flow">
+            case</span><span class="char"> 'a'</span><span class="operator">:</span>
+                menu<span class="operator">();</span>
+                absolut<span class="operator">=!</span>absolut<span class="operator">;</span><span class="flow">
+                break</span><span class="operator">;</span><span class="flow">
+            case</span><span class="char"> 'm'</span><span class="operator">:</span>
+                menu<span class="operator">();</span>
+                mask<span class="operator"> =</span> Mat<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int"> 3</span><span class="operator">,</span> CV_32F<span class="operator">,</span> media<span class="operator">);</span>
+                scaleAdd<span class="operator">(</span>mask<span class="operator">,</span><span class="int"> 1</span><span class="operator">/</span><span class="float">9.0</span><span class="operator">,</span> Mat<span class="operator">::</span>zeros<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int">3</span><span class="operator">,</span>CV_32F<span class="operator">),</span> mask1<span class="operator">);</span>
+                mask<span class="operator"> =</span> mask1<span class="operator">;</span>
+                printmask<span class="operator">(</span>mask<span class="operator">);</span><span class="flow">
+                break</span><span class="operator">;</span><span class="flow">
+            case</span><span class="char"> 'g'</span><span class="operator">:</span>
+                menu<span class="operator">();</span>
+                mask<span class="operator"> =</span> Mat<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int"> 3</span><span class="operator">,</span> CV_32F<span class="operator">,</span> gauss<span class="operator">);</span>
+                scaleAdd<span class="operator">(</span>mask<span class="operator">,</span><span class="int"> 1</span><span class="operator">/</span><span class="float">16.0</span><span class="operator">,</span> Mat<span class="operator">::</span>zeros<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int">3</span><span class="operator">,</span>CV_32F<span class="operator">),</span> mask1<span class="operator">);</span>
+                mask<span class="operator"> =</span> mask1<span class="operator">;</span>
+                printmask<span class="operator">(</span>mask<span class="operator">);</span><span class="flow">
+                break</span><span class="operator">;</span><span class="flow">
+            case</span><span class="char"> 'h'</span><span class="operator">:</span>
+                menu<span class="operator">();</span>
+                mask<span class="operator"> =</span> Mat<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int"> 3</span><span class="operator">,</span> CV_32F<span class="operator">,</span> horizontal<span class="operator">);</span>
+                printmask<span class="operator">(</span>mask<span class="operator">);</span><span class="flow">
+                break</span><span class="operator">;</span><span class="flow">
+            case</span><span class="char"> 'v'</span><span class="operator">:</span>
+                menu<span class="operator">();</span>
+                mask<span class="operator"> =</span> Mat<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int"> 3</span><span class="operator">,</span> CV_32F<span class="operator">,</span> vertical<span class="operator">);</span>
+                printmask<span class="operator">(</span>mask<span class="operator">);</span><span class="flow">
+                break</span><span class="operator">;</span><span class="flow">
+            case</span><span class="char"> 'l'</span><span class="operator">:</span>
+                menu<span class="operator">();</span>
+                mask<span class="operator"> =</span> Mat<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int"> 3</span><span class="operator">,</span> CV_32F<span class="operator">,</span> laplacian<span class="operator">);</span>
+                printmask<span class="operator">(</span>mask<span class="operator">);</span><span class="flow">
+                break</span><span class="operator">;</span><span class="flow">
+            case</span><span class="char"> 'x'</span><span class="operator">:</span>
+                menu<span class="operator">();</span>
+                lapGau<span class="operator"> =</span><span class="bool"> true</span><span class="operator">;</span><span class="flow">
+                break</span><span class="operator">;</span><span class="flow">
+            default</span><span class="operator">:</span><span class="flow">
+                break</span><span class="operator">;
+        }
+    }</span><span class="flow">
+    return</span><span class="int"> 0</span><span class="operator">;
+}</span>
+</pre>

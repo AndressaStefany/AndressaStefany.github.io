@@ -1,0 +1,45 @@
+body {
+  min-height: 2000px;
+  padding-top: 70px;
+  font-family: "Open Sans", Arial, Helvetica, Sans-Serif;
+}
+
+.buttonOrange {
+  background-color: #e38d13;
+  color: white;
+}
+
+.no-margin-bottom {
+    margin-bottom: 0px!important;
+}
+
+.no-margin-top {
+    margin-top: 0px!important;
+}
+
+.apresation {
+    padding-left: 30px;
+    padding-right: 30px;
+    background-color: white!important;
+}
+
+.reticencias {
+    padding-left: 30px;
+}
+
+.blog-post-title {
+    margin-bottom: .25rem;
+    font-size: 2.5rem;
+}
+
+.comment { color: #999999; font-style: italic; }
+.pre { color: #000099; }
+.string { color: #009900; }
+.char { color: #009900; }
+.float { color: #996600; }
+.int { color: #999900; }
+.bool { color: #000000; font-weight: bold; }
+.type { color: #FF6633; }
+.flow { color: #FF0000; }
+.keyword { color: #990000; }
+.operator { color: #663300; font-weight: bold; }

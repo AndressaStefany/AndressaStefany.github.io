@@ -1,0 +1,151 @@
+<pre><span class="pre">#include &lt;iostream&gt;
+#include &lt;stack&gt;
+#include &lt;list&gt;
+#include &lt;vector&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+</span><span class="keyword">
+using namespace</span> cv<span class="operator">;</span><span class="keyword">
+using namespace</span> std<span class="operator">;</span><span class="type">
+
+void</span> myseedfill<span class="operator">(</span>Mat image<span class="operator">,</span><span class="type"> int</span> cor<span class="operator">,</span><span class="type"> int</span> searchcor<span class="operator">,</span> stack<span class="operator">&lt;</span>CvPoint<span class="operator">&gt;</span> pilha<span class="operator">){</span>
+    CvPoint coordenada<span class="operator">,</span> aux<span class="operator">;</span><span class="flow">
+
+    while</span><span class="operator">(!</span>pilha<span class="operator">.</span>empty<span class="operator">()){</span>
+        coordenada<span class="operator"> =</span> pilha<span class="operator">.</span>top<span class="operator">();</span>
+        pilha<span class="operator">.</span>pop<span class="operator">();</span><span class="comment">
+
+        //vizinho de esquerda
+</span><span class="flow">        if</span><span class="operator">(</span>coordenada<span class="operator">.</span>y<span class="operator">-</span><span class="int">1</span><span class="operator">&gt;=</span><span class="int">0</span><span class="operator"> &amp;&amp;</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>coordenada<span class="operator">.</span>x<span class="operator">,</span>coordenada<span class="operator">.</span>y<span class="operator">-</span><span class="int">1</span><span class="operator">)==</span>searchcor<span class="operator">){</span>
+            aux<span class="operator">.</span>x<span class="operator">=</span>coordenada<span class="operator">.</span>x<span class="operator">;</span>
+            aux<span class="operator">.</span>y<span class="operator">=</span>coordenada<span class="operator">.</span>y<span class="operator">-</span><span class="int">1</span><span class="operator">;</span>
+            pilha<span class="operator">.</span>push<span class="operator">(</span>aux<span class="operator">);
+        }</span><span class="comment">
+        //vizinho da direita
+</span><span class="flow">        if</span><span class="operator">(</span>coordenada<span class="operator">.</span>y<span class="operator">+</span><span class="int">1</span><span class="operator">&lt;</span>image<span class="operator">.</span>size<span class="operator">().</span>width<span class="operator"> &amp;&amp;</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>coordenada<span class="operator">.</span>x<span class="operator">,</span>coordenada<span class="operator">.</span>y<span class="operator">+</span><span class="int">1</span><span class="operator">)==</span>searchcor<span class="operator">){</span>
+            aux<span class="operator">.</span>x<span class="operator">=</span>coordenada<span class="operator">.</span>x<span class="operator">;</span>
+            aux<span class="operator">.</span>y<span class="operator">=</span>coordenada<span class="operator">.</span>y<span class="operator">+</span><span class="int">1</span><span class="operator">;</span>
+            pilha<span class="operator">.</span>push<span class="operator">(</span>aux<span class="operator">);
+        }</span><span class="comment">
+        //vizinho de baixo
+</span><span class="flow">        if</span><span class="operator">(</span>coordenada<span class="operator">.</span>x<span class="operator">+</span><span class="int">1</span><span class="operator">&lt;</span>image<span class="operator">.</span>size<span class="operator">().</span>height<span class="operator"> &amp;&amp;</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>coordenada<span class="operator">.</span>x<span class="operator">+</span><span class="int">1</span><span class="operator">,</span>coordenada<span class="operator">.</span>y<span class="operator">)==</span>searchcor<span class="operator">){</span>
+            aux<span class="operator">.</span>x<span class="operator">=</span>coordenada<span class="operator">.</span>x<span class="operator">+</span><span class="int">1</span><span class="operator">;</span>
+            aux<span class="operator">.</span>y<span class="operator">=</span>coordenada<span class="operator">.</span>y<span class="operator">;</span>
+            pilha<span class="operator">.</span>push<span class="operator">(</span>aux<span class="operator">);
+        }</span><span class="comment">
+        //vizinho de cima
+</span><span class="flow">        if</span><span class="operator">(</span>coordenada<span class="operator">.</span>x<span class="operator">-</span><span class="int">1</span><span class="operator">&gt;=</span><span class="int">0</span><span class="operator"> &amp;&amp;</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>coordenada<span class="operator">.</span>x<span class="operator">-</span><span class="int">1</span><span class="operator">,</span>coordenada<span class="operator">.</span>y<span class="operator">)==</span>searchcor<span class="operator">){</span>
+            aux<span class="operator">.</span>x<span class="operator">=</span>coordenada<span class="operator">.</span>x<span class="operator">-</span><span class="int">1</span><span class="operator">;</span>
+            aux<span class="operator">.</span>y<span class="operator">=</span>coordenada<span class="operator">.</span>y<span class="operator">;</span>
+            pilha<span class="operator">.</span>push<span class="operator">(</span>aux<span class="operator">);
+        }</span>
+        image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>coordenada<span class="operator">.</span>x<span class="operator">,</span>coordenada<span class="operator">.</span>y<span class="operator">) =</span> cor<span class="operator">;
+
+    }</span><span class="comment">//fim do while
+</span><span class="operator">}</span><span class="type">
+
+int</span><span class="keyword"> main</span><span class="operator">(</span><span class="type">int</span><span class="operator">,</span><span class="type"> char</span><span class="operator">**){</span>
+    Mat image<span class="operator">;</span>
+    stack<span class="operator">&lt;</span>CvPoint<span class="operator">&gt;</span> pilha<span class="operator">;</span>
+    CvPoint coordenada<span class="operator">;</span><span class="type">
+    int</span> cont<span class="operator"> =</span><span class="int"> 50</span><span class="operator">,</span> buracos<span class="operator"> =</span><span class="int"> 0</span><span class="operator">,</span> total<span class="operator">,</span> width<span class="operator">,</span> height<span class="operator">;</span>
+
+    image<span class="operator"> =</span> imread<span class="operator">(</span><span class="string">"../images/bolhas.png"</span><span class="operator">,</span>CV_LOAD_IMAGE_GRAYSCALE<span class="operator">);</span>
+    width<span class="operator"> =</span> image<span class="operator">.</span>size<span class="operator">().</span>width<span class="operator">;</span>
+    height<span class="operator"> =</span> image<span class="operator">.</span>size<span class="operator">().</span>height<span class="operator">;</span><span class="flow">
+
+    if</span><span class="operator">(!</span>image<span class="operator">.</span>data<span class="operator">)</span>
+        cout<span class="operator"> &lt;&lt;</span><span class="string"> "nao abriu bolhas.png"</span><span class="operator"> &lt;&lt;</span> endl<span class="operator">;</span>
+
+    namedWindow<span class="operator">(</span><span class="string">"janela1"</span><span class="operator">,</span>WINDOW_AUTOSIZE<span class="operator">);</span>
+    imshow<span class="operator">(</span><span class="string">"janela1"</span><span class="operator">,</span> image<span class="operator">);</span><span class="comment">
+
+    //verificando bolhas nas bordas
+</span><span class="flow">    for</span><span class="operator">(</span><span class="type">int</span> i<span class="operator">=</span><span class="int">0</span><span class="operator">;</span>i<span class="operator">&lt;</span>width<span class="operator">;</span>i<span class="operator">++){</span><span class="flow">
+        if</span><span class="operator">(</span>image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>i<span class="operator">,</span><span class="int">0</span><span class="operator">)==</span><span class="int">255</span><span class="operator"> ||</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>i<span class="operator">,</span>height<span class="operator">-</span><span class="int">1</span><span class="operator">)==</span><span class="int">255</span><span class="operator"> ||</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span><span class="int">0</span><span class="operator">,</span>i<span class="operator">)==</span><span class="int">255</span><span class="operator">
+           ||</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>width<span class="operator">-</span><span class="int">1</span><span class="operator">,</span>i<span class="operator">)==</span><span class="int">255</span><span class="operator">){</span><span class="flow">
+
+            if</span><span class="operator">(</span>image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>i<span class="operator">,</span><span class="int">0</span><span class="operator">)==</span><span class="int">255</span><span class="operator"> ||</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>i<span class="operator">,</span>height<span class="operator">-</span><span class="int">1</span><span class="operator">)==</span><span class="int">255</span><span class="operator">) {</span><span class="comment"> //primeira e ultima coluna
+</span>                coordenada<span class="operator">.</span>x<span class="operator"> =</span> i<span class="operator">;</span>
+                coordenada<span class="operator">.</span>y<span class="operator"> = (</span>image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>i<span class="operator">,</span><span class="int"> 0</span><span class="operator">) ==</span><span class="int"> 255</span><span class="operator">) ?</span><span class="int"> 0</span><span class="operator"> :</span> height<span class="operator">-</span><span class="int">1</span><span class="operator">;
+            }</span><span class="flow">
+
+            if</span><span class="operator">(</span>image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span><span class="int">0</span><span class="operator">,</span>i<span class="operator">)==</span><span class="int">255</span><span class="operator"> ||</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>width<span class="operator">-</span><span class="int">1</span><span class="operator">,</span>i<span class="operator">)==</span><span class="int">255</span><span class="operator">) {</span><span class="comment"> //primeira e ultima linha
+</span>                coordenada<span class="operator">.</span>x<span class="operator"> = (</span>image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span><span class="int">0</span><span class="operator">,</span>i<span class="operator">)==</span><span class="int">255</span><span class="operator">)?</span><span class="int"> 0</span><span class="operator"> :</span> width<span class="operator">-</span><span class="int">1</span><span class="operator">;</span>
+                coordenada<span class="operator">.</span>y<span class="operator"> =</span> i<span class="operator">;
+            }</span>
+
+            pilha<span class="operator">.</span>push<span class="operator">(</span>coordenada<span class="operator">);</span>
+
+            myseedfill<span class="operator">(</span>image<span class="operator">,</span><span class="int"> 0</span><span class="operator">,</span><span class="int"> 255</span><span class="operator">,</span> pilha<span class="operator">);
+        }
+    }</span>
+
+    waitKey<span class="operator">();</span>
+    namedWindow<span class="operator">(</span><span class="string">"janela2"</span><span class="operator">,</span>WINDOW_AUTOSIZE<span class="operator">);</span>
+    imshow<span class="operator">(</span><span class="string">"janela2"</span><span class="operator">,</span> image<span class="operator">);</span><span class="comment">
+
+    //pinta as bolhas do centro
+</span><span class="flow">    for</span><span class="operator">(</span><span class="type">int</span> l<span class="operator">=</span><span class="int">0</span><span class="operator">;</span>l<span class="operator">&lt;</span>height<span class="operator">;</span>l<span class="operator">++){</span><span class="flow">
+        for</span><span class="operator">(</span><span class="type">int</span> c<span class="operator">=</span><span class="int">0</span><span class="operator">;</span>c<span class="operator">&lt;</span>width<span class="operator">;</span>c<span class="operator">++){</span><span class="flow">
+            if</span><span class="operator">(</span>image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>l<span class="operator">,</span>c<span class="operator">)==</span><span class="int">255</span><span class="operator">){</span>
+                coordenada<span class="operator">.</span>x<span class="operator"> =</span> l<span class="operator">;</span>
+                coordenada<span class="operator">.</span>y<span class="operator"> =</span> c<span class="operator">;</span>
+
+                pilha<span class="operator">.</span>push<span class="operator">(</span>coordenada<span class="operator">);</span>
+
+                cont<span class="operator">++;</span>
+
+                myseedfill<span class="operator">(</span>image<span class="operator">,</span><span class="int"> 200</span><span class="operator">,</span><span class="int"> 255</span><span class="operator">,</span> pilha<span class="operator">);
+            }
+        }
+    }</span>
+
+    waitKey<span class="operator">();</span>
+    namedWindow<span class="operator">(</span><span class="string">"janela3"</span><span class="operator">,</span>WINDOW_AUTOSIZE<span class="operator">);</span>
+    imshow<span class="operator">(</span><span class="string">"janela3"</span><span class="operator">,</span> image<span class="operator">);</span>
+
+    total<span class="operator"> =</span> cont<span class="operator">-</span><span class="int">50</span><span class="operator">;</span><span class="comment">
+
+    //pinta o fundo
+</span>    coordenada<span class="operator">.</span>x<span class="operator"> =</span><span class="int"> 0</span><span class="operator">;</span>
+    coordenada<span class="operator">.</span>y<span class="operator"> =</span><span class="int"> 0</span><span class="operator">;</span>
+
+    pilha<span class="operator">.</span>push<span class="operator">(</span>coordenada<span class="operator">);</span>
+
+    myseedfill<span class="operator">(</span>image<span class="operator">,</span><span class="int"> 255</span><span class="operator">,</span><span class="int"> 0</span><span class="operator">,</span> pilha<span class="operator">);</span>
+
+    waitKey<span class="operator">();</span>
+    namedWindow<span class="operator">(</span><span class="string">"janela4"</span><span class="operator">,</span>WINDOW_AUTOSIZE<span class="operator">);</span>
+    imshow<span class="operator">(</span><span class="string">"janela4"</span><span class="operator">,</span> image<span class="operator">);</span><span class="comment">
+
+    //conta as bolhas com buraco
+</span><span class="flow">    for</span><span class="operator">(</span><span class="type">int</span> l<span class="operator">=</span><span class="int">0</span><span class="operator">;</span>l<span class="operator">&lt;</span>height<span class="operator">;</span>l<span class="operator">++){</span><span class="flow">
+        for</span><span class="operator">(</span><span class="type">int</span> c<span class="operator">=</span><span class="int">0</span><span class="operator">;</span>c<span class="operator">&lt;</span>width<span class="operator">;</span>c<span class="operator">++){</span><span class="flow">
+
+            if</span><span class="operator">(</span>image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>l<span class="operator">,</span>c<span class="operator">)==</span><span class="int">0</span><span class="operator">) {</span><span class="comment">//procura o preto
+</span>
+                coordenada<span class="operator">.</span>x<span class="operator"> =</span> l<span class="operator">;</span>
+                coordenada<span class="operator">.</span>y<span class="operator"> =</span> c<span class="operator">;</span>
+
+                pilha<span class="operator">.</span>push<span class="operator">(</span>coordenada<span class="operator">);</span>
+
+                myseedfill<span class="operator">(</span>image<span class="operator">,</span><span class="int"> 50</span><span class="operator">,</span><span class="int"> 0</span><span class="operator">,</span> pilha<span class="operator">);</span><span class="comment">
+
+                //eh uma nova bolha?
+</span><span class="flow">                if</span><span class="operator">(</span>image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>l<span class="operator">,</span> c<span class="operator">-</span><span class="int">1</span><span class="operator">) ==</span><span class="int"> 200</span><span class="operator">){</span>
+                    buracos<span class="operator">++;</span>
+                    myseedfill<span class="operator">(</span>image<span class="operator">,</span><span class="int"> 100</span><span class="operator">,</span><span class="int"> 0</span><span class="operator">,</span> pilha<span class="operator">);
+                }
+
+            }
+        }
+    }</span>
+
+
+    cout<span class="operator">&lt;&lt;</span>endl<span class="operator">&lt;&lt;</span>endl<span class="operator">&lt;&lt;</span><span class="string">"Tem o total de "</span><span class="operator">&lt;&lt;</span>total<span class="operator">&lt;&lt;</span><span class="string">" bolhas."</span><span class="operator">&lt;&lt;</span>endl<span class="operator">&lt;&lt;</span><span class="string">"Sendo "</span><span class="operator">
+        &lt;&lt;</span>buracos<span class="operator">&lt;&lt;</span><span class="string">" bolhas com buracos e "</span><span class="operator">&lt;&lt;</span>total<span class="operator">-</span>buracos<span class="operator">&lt;&lt;</span><span class="string">" bolhas sem buracos."</span><span class="operator">
+        &lt;&lt;</span>endl<span class="operator">&lt;&lt;</span>endl<span class="operator">&lt;&lt;</span><span class="string">"FIM!"</span><span class="operator">&lt;&lt;</span>endl<span class="operator">;</span>
+    waitKey<span class="operator">();</span><span class="flow">
+
+    return</span><span class="int"> 0</span><span class="operator">;
+}</span></pre>

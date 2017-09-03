@@ -1,0 +1,41 @@
+<pre><span class="pre">#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+</span><span class="keyword">
+using namespace</span> cv<span class="operator">;</span><span class="keyword">
+using namespace</span> std<span class="operator">;</span><span class="type">
+
+int</span><span class="keyword"> main</span><span class="operator">(</span><span class="type">int</span><span class="operator">,</span><span class="type"> char</span><span class="operator">**){</span>
+    Mat image<span class="operator">,</span> otherImage<span class="operator">;</span><span class="type">
+    int</span> width<span class="operator">,</span> height<span class="operator">,</span> aux1<span class="operator">,</span> aux2<span class="operator">;</span>
+
+    image<span class="operator">=</span> imread<span class="operator">(</span><span class="string">"biel.png"</span><span class="operator">,</span>CV_LOAD_IMAGE_GRAYSCALE<span class="operator">);</span>
+    width<span class="operator"> =</span> image<span class="operator">.</span>size<span class="operator">().</span>width<span class="operator">;</span>
+    height<span class="operator"> =</span> image<span class="operator">.</span>size<span class="operator">().</span>height<span class="operator">;</span><span class="flow">
+
+    if</span><span class="operator">(!</span>image<span class="operator">.</span>data<span class="operator">) {</span>
+        cout<span class="operator"> &lt;&lt;</span><span class="string"> "nao abriu biel.png"</span><span class="operator"> &lt;&lt;</span> endl<span class="operator">;</span><span class="flow">
+        return</span><span class="int"> 0</span><span class="operator">;
+    }</span>
+
+    imshow<span class="operator">(</span><span class="string">"janela"</span><span class="operator">,</span> image<span class="operator">);</span>
+    waitKey<span class="operator">();</span><span class="flow">
+
+    for</span><span class="operator">(</span><span class="type">int</span> i<span class="operator"> =</span><span class="int"> 0</span><span class="operator">;</span>i<span class="operator">&lt;</span>height<span class="operator">/</span><span class="int">2</span><span class="operator">;</span>i<span class="operator">++) {</span><span class="flow">
+        for</span><span class="operator"> (</span><span class="type">int</span> j<span class="operator"> =</span><span class="int"> 0</span><span class="operator">;</span> j<span class="operator">&lt;</span>width<span class="operator">/</span><span class="int">2</span><span class="operator">;</span> j<span class="operator">++) {</span>
+            aux1<span class="operator"> =</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>height<span class="operator">/</span><span class="int">2</span><span class="operator"> +</span> i<span class="operator">,</span> width<span class="operator">/</span><span class="int">2</span><span class="operator"> +</span> j<span class="operator">);</span>
+            aux2<span class="operator"> =</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>i<span class="operator">,</span> j<span class="operator">);</span>
+            image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>i<span class="operator">,</span> j<span class="operator">) =</span> aux1<span class="operator">;</span><span class="comment"> // segundo quadrante
+</span>            image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>height<span class="operator">/</span><span class="int">2</span><span class="operator"> +</span> i<span class="operator">,</span> width<span class="operator">/</span><span class="int">2</span><span class="operator"> +</span> j<span class="operator">) =</span> aux2<span class="operator">;</span><span class="comment"> //quarto quadrante
+</span>
+            aux1<span class="operator"> =</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>height<span class="operator">/</span><span class="int">2</span><span class="operator"> +</span> i<span class="operator">,</span> j<span class="operator">);</span>
+            aux2<span class="operator"> =</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>i<span class="operator">,</span> width<span class="operator">/</span><span class="int">2</span><span class="operator"> +</span> j<span class="operator">);</span>
+            image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>i<span class="operator">,</span> width<span class="operator">/</span><span class="int">2</span><span class="operator"> +</span> j<span class="operator">) =</span> aux1<span class="operator">;</span><span class="comment"> // primeiro quadrante
+</span>            image<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>height<span class="operator">/</span><span class="int">2</span><span class="operator"> +</span> i<span class="operator">,</span> j<span class="operator">) =</span> aux2<span class="operator">;</span><span class="comment"> // terceiro quadrante
+</span><span class="operator">        }
+    }</span>
+
+    imshow<span class="operator">(</span><span class="string">"janela"</span><span class="operator">,</span> image<span class="operator">);</span>
+    waitKey<span class="operator">();</span><span class="flow">
+
+    return</span><span class="int"> 0</span><span class="operator">;
+}</span></pre>
