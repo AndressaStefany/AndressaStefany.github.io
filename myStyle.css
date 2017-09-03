@@ -23,8 +23,10 @@ body {
     background-color: white!important;
 }
 
-.reticencias {
-    padding-left: 30px;
+.figure {
+    text-align: center;
+    opacity: 0.5;
+    margin-top: 6%;
 }
 
 .blog-post-title {
