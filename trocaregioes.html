@@ -8,12 +8,12 @@ int</span><span class="keyword"> main</span><span class="operator">(</span><span
     Mat image<span class="operator">,</span> otherImage<span class="operator">;</span><span class="type">
     int</span> width<span class="operator">,</span> height<span class="operator">,</span> aux1<span class="operator">,</span> aux2<span class="operator">;</span>
 
-    image<span class="operator">=</span> imread<span class="operator">(</span><span class="string">"biel.png"</span><span class="operator">,</span>CV_LOAD_IMAGE_GRAYSCALE<span class="operator">);</span>
+    image<span class="operator">=</span> imread<span class="operator">(</span><span class="string">"../images/pingo.png"</span><span class="operator">,</span>CV_LOAD_IMAGE_GRAYSCALE<span class="operator">);</span>
     width<span class="operator"> =</span> image<span class="operator">.</span>size<span class="operator">().</span>width<span class="operator">;</span>
     height<span class="operator"> =</span> image<span class="operator">.</span>size<span class="operator">().</span>height<span class="operator">;</span><span class="flow">
 
     if</span><span class="operator">(!</span>image<span class="operator">.</span>data<span class="operator">) {</span>
-        cout<span class="operator"> &lt;&lt;</span><span class="string"> "nao abriu biel.png"</span><span class="operator"> &lt;&lt;</span> endl<span class="operator">;</span><span class="flow">
+        cout<span class="operator"> &lt;&lt;</span><span class="string"> "nao abriu pingo.png"</span><span class="operator"> &lt;&lt;</span> endl<span class="operator">;</span><span class="flow">
         return</span><span class="int"> 0</span><span class="operator">;
     }</span>
 

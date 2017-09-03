@@ -8,17 +8,16 @@ int main(int, char**){
     Mat image, otherImage;
     int width, height, aux1, aux2;
 
-    image= imread("biel.png",CV_LOAD_IMAGE_GRAYSCALE);
+    image= imread("../images/pingo.png",CV_LOAD_IMAGE_GRAYSCALE);
     width = image.size().width;
     height = image.size().height;
 
     if(!image.data) {
-        cout << "nao abriu biel.png" << endl;
+        cout << "nao abriu pingo.png" << endl;
         return 0;
     }
 
-    imshow("janela", image);
-    waitKey();
+    imshow("janela1", image);
 
     for(int i = 0;i<height/2;i++) {
         for (int j = 0; j<width/2; j++) {
@@ -34,7 +33,7 @@ int main(int, char**){
         }
     }
 
-    imshow("janela", image);
+    imshow("janela2", image);
     waitKey();
 
     return 0;

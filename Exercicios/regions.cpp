@@ -17,16 +17,16 @@ int main(int, char**){
     bool pertence;
     CvPoint p1, p2;
 
-    image= imread("../biel.png",CV_LOAD_IMAGE_GRAYSCALE);
+    image= imread("../images/pingo.png",CV_LOAD_IMAGE_GRAYSCALE);
     width = image.size().width;
     height = image.size().height;
 
     if(!image.data) {
-        cout << "nao abriu biel.png" << endl;
+        cout << "nao abriu pingo.png" << endl;
         return 0;
     }
 
-    cout<<"Informe P1: "<<endl;
+    cout<<"Informe P1: ";
     cin >> x1 >> y1;
 
     pertence = confere(width,height,x1,y1);
@@ -34,28 +34,26 @@ int main(int, char**){
     if(pertence) {
         p1.x = x1;
         p1.y = y1;
-        cout<< "p1 " << p1.x <<p1.y<<endl<<endl;
     } else {
         cout << "A coordenada não pertence à imagem!"<< endl;
         return 0;
     }
 
-    cout<<"Informe P2: "<<endl;
+    cout<<endl<<"Informe P2: ";
     cin >> x1 >> y1;
+    cout<<endl;
 
     pertence = confere(width,height,x1,y1);
 
     if(pertence) {
         p2.x = x1;
         p2.y = y1;
-        cout<< "p2 " << p2.x <<p2.y<<endl<<endl;
     } else {
         cout << "A coordenada não pertence à imagem!"<< endl;
         return 0;
     }
 
-    imshow("janela", image);
-    waitKey();
+    imshow("janela1", image);
 
     for(int i=p1.x;i<p2.x;i++) {
         for (int j = p1.y; j<p2.y; j++)
@@ -63,7 +61,7 @@ int main(int, char**){
 
     }
 
-    imshow("janela", image);
+    imshow("janela2", image);
     waitKey();
 
     return 0;

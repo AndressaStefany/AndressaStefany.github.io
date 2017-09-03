@@ -34,6 +34,10 @@ body {
     font-size: 2.5rem;
 }
 
+.things-center {
+    text-align: center;
+}
+
 .comment { color: #999999; font-style: italic; }
 .pre { color: #000099; }
 .string { color: #009900; }
