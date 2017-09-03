@@ -38,6 +38,11 @@ body {
     text-align: center;
 }
 
+.footer {
+    color: #999999;
+    font-size: small;
+}
+
 .comment { color: #999999; font-style: italic; }
 .pre { color: #000099; }
 .string { color: #009900; }
