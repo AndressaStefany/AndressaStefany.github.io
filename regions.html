@@ -26,36 +26,34 @@ int</span><span class="keyword"> main</span><span class="operator">(</span><span
         return</span><span class="int"> 0</span><span class="operator">;
     }</span>
 
-    cout<span class="operator">&lt;&lt;</span><span class="string">"Informe P1: "</span><span class="operator">&lt;&lt;</span>endl<span class="operator">;</span>
+    cout<span class="operator">&lt;&lt;</span><span class="string">"Informe P1: "</span><span class="operator">;</span>
     cin<span class="operator"> &gt;&gt;</span> x1<span class="operator"> &gt;&gt;</span> y1<span class="operator">;</span>
 
     pertence<span class="operator"> =</span> confere<span class="operator">(</span>width<span class="operator">,</span>height<span class="operator">,</span>x1<span class="operator">,</span>y1<span class="operator">);</span><span class="flow">
 
     if</span><span class="operator">(</span>pertence<span class="operator">) {</span>
         p1<span class="operator">.</span>x<span class="operator"> =</span> x1<span class="operator">;</span>
-        p1<span class="operator">.</span>y<span class="operator"> =</span> y1<span class="operator">;</span>
-        cout<span class="operator">&lt;&lt;</span><span class="string"> "p1 "</span><span class="operator"> &lt;&lt;</span> p1<span class="operator">.</span>x<span class="operator"> &lt;&lt;</span>p1<span class="operator">.</span>y<span class="operator">&lt;&lt;</span>endl<span class="operator">&lt;&lt;</span>endl<span class="operator">;
+        p1<span class="operator">.</span>y<span class="operator"> =</span> y1<span class="operator">;
     }</span><span class="flow"> else</span><span class="operator"> {</span>
         cout<span class="operator"> &lt;&lt;</span><span class="string"> "A coordenada não pertence à imagem!"</span><span class="operator">&lt;&lt;</span> endl<span class="operator">;</span><span class="flow">
         return</span><span class="int"> 0</span><span class="operator">;
     }</span>
 
-    cout<span class="operator">&lt;&lt;</span><span class="string">"Informe P2: "</span><span class="operator">&lt;&lt;</span>endl<span class="operator">;</span>
+    cout<span class="operator">&lt;&lt;</span>endl<span class="operator">&lt;&lt;</span><span class="string">"Informe P2: "</span><span class="operator">;</span>
     cin<span class="operator"> &gt;&gt;</span> x1<span class="operator"> &gt;&gt;</span> y1<span class="operator">;</span>
+    cout<span class="operator">&lt;&lt;</span>endl<span class="operator">;</span>
 
     pertence<span class="operator"> =</span> confere<span class="operator">(</span>width<span class="operator">,</span>height<span class="operator">,</span>x1<span class="operator">,</span>y1<span class="operator">);</span><span class="flow">
 
     if</span><span class="operator">(</span>pertence<span class="operator">) {</span>
         p2<span class="operator">.</span>x<span class="operator"> =</span> x1<span class="operator">;</span>
-        p2<span class="operator">.</span>y<span class="operator"> =</span> y1<span class="operator">;</span>
-        cout<span class="operator">&lt;&lt;</span><span class="string"> "p2 "</span><span class="operator"> &lt;&lt;</span> p2<span class="operator">.</span>x<span class="operator"> &lt;&lt;</span>p2<span class="operator">.</span>y<span class="operator">&lt;&lt;</span>endl<span class="operator">&lt;&lt;</span>endl<span class="operator">;
+        p2<span class="operator">.</span>y<span class="operator"> =</span> y1<span class="operator">;
     }</span><span class="flow"> else</span><span class="operator"> {</span>
         cout<span class="operator"> &lt;&lt;</span><span class="string"> "A coordenada não pertence à imagem!"</span><span class="operator">&lt;&lt;</span> endl<span class="operator">;</span><span class="flow">
         return</span><span class="int"> 0</span><span class="operator">;
     }</span>
 
-    imshow<span class="operator">(</span><span class="string">"janela"</span><span class="operator">,</span> image<span class="operator">);</span>
-    waitKey<span class="operator">();</span><span class="flow">
+    imshow<span class="operator">(</span><span class="string">"janela1"</span><span class="operator">,</span> image<span class="operator">);</span><span class="flow">
 
     for</span><span class="operator">(</span><span class="type">int</span> i<span class="operator">=</span>p1<span class="operator">.</span>x<span class="operator">;</span>i<span class="operator">&lt;</span>p2<span class="operator">.</span>x<span class="operator">;</span>i<span class="operator">++) {</span><span class="flow">
         for</span><span class="operator"> (</span><span class="type">int</span> j<span class="operator"> =</span> p1<span class="operator">.</span>y<span class="operator">;</span> j<span class="operator">&lt;</span>p2<span class="operator">.</span>y<span class="operator">;</span> j<span class="operator">++)</span>
@@ -63,7 +61,7 @@ int</span><span class="keyword"> main</span><span class="operator">(</span><span
 
     }</span>
 
-    imshow<span class="operator">(</span><span class="string">"janela"</span><span class="operator">,</span> image<span class="operator">);</span>
+    imshow<span class="operator">(</span><span class="string">"janela2"</span><span class="operator">,</span> image<span class="operator">);</span>
     waitKey<span class="operator">();</span><span class="flow">
 
     return</span><span class="int"> 0</span><span class="operator">;
