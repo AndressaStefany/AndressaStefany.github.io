@@ -5,15 +5,15 @@
 using namespace cv;
 using namespace std;
 
-int alfa_slider = 1, alfa_slider_max = 100;
+int alfa_slider, alfa_slider_max = 100;
 int h_slider, h_max;//altura
 int t_slider, t_max;//tamanho da janela de foco
 
 double tcima, tbaixo;
 
-double tiltshift(int x, int a, int b, int c) {
+double tiltshift(int x, double a, double b, double c) {
     if(c>0)
-        return 0.5*(tanh((x-a)/c)-tanh((x-b)/c));
+        return (double)0.5*(tanh((x-a)/c)-tanh((x-b)/c));
 }
 
 void on_trackbar_blend(int, void*){
@@ -32,7 +32,7 @@ int main(int argvc, char** argv){
 
     image = imread("../images/cidade.jpg");
     imageBor = image.clone();
-/*    imageBor = Mat::zeros(image.size(), CV_8UC3); //para teste*/
+    /*imageBor = Mat::zeros(image.size(), CV_8UC3); //para teste*/
 
     Mat blended = Mat::zeros(image.size(), CV_8UC3);
 
