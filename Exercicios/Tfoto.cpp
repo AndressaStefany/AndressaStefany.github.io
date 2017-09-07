@@ -14,12 +14,8 @@ double tcima, tbaixo;
 double tiltshift(int x, double a, double b, double c) {
     if(c>0)
         return (double)0.5*(tanh((x-a)/c)-tanh((x-b)/c));
-}
-
-void on_trackbar_blend(int, void*){
-//    alfa = (double) alfa_slider/alfa_slider_max ;
-//    addWeighted( image1, alfa, imageTop, 1-alfa, 0.0, blended);
-//    imshow("addweighted", blended);
+    else
+        return 0;
 }
 
 void on_trackbar(int, void*){
@@ -53,8 +49,7 @@ int main(int argvc, char** argv){
     on_trackbar(t_slider, 0);
 
     //Nivel do desfoque
-    createTrackbar("Alpha:", "window", &alfa_slider, alfa_slider_max, on_trackbar_blend);
-    on_trackbar_blend(alfa_slider, 0);
+    createTrackbar("Alpha:", "window", &alfa_slider, alfa_slider_max);
 
     while(1){
         //imagem resultante
