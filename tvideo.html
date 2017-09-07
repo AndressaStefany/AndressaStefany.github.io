@@ -1,0 +1,95 @@
+<pre><span class="pre">#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+#include &lt;math.h&gt;
+</span><span class="keyword">
+using namespace</span> cv<span class="operator">;</span><span class="keyword">
+using namespace</span> std<span class="operator">;</span><span class="type">
+
+int</span> alfa_slider<span class="operator"> =</span><span class="int"> 25</span><span class="operator">,</span> alfa_slider_max<span class="operator"> =</span><span class="int"> 100</span><span class="operator">;</span><span class="comment">// default 25
+</span><span class="type">int</span> h_slider<span class="operator"> =</span><span class="int"> 257</span><span class="operator">,</span> h_max<span class="operator">;</span><span class="comment">//altura, default 257
+</span><span class="type">int</span> t_slider<span class="operator"> =</span><span class="int"> 122</span><span class="operator">,</span> t_max<span class="operator">;</span><span class="comment">//tamanho da janela de foco, default 122
+</span><span class="type">
+double</span> tcima<span class="operator">,</span> tbaixo<span class="operator">;</span><span class="type">
+
+double</span> tiltshift<span class="operator">(</span><span class="type">int</span> x<span class="operator">,</span><span class="type"> double</span> a<span class="operator">,</span><span class="type"> double</span> b<span class="operator">,</span><span class="type"> double</span> c<span class="operator">) {</span><span class="flow">
+    if</span><span class="operator">(</span>c<span class="operator">&gt;</span><span class="int">0</span><span class="operator">)</span><span class="flow">
+        return</span><span class="operator"> (</span><span class="type">double</span><span class="operator">)</span><span class="float">0.5</span><span class="operator">*(</span>tanh<span class="operator">((</span>x<span class="operator">-</span>a<span class="operator">)/</span>c<span class="operator">)-</span>tanh<span class="operator">((</span>x<span class="operator">-</span>b<span class="operator">)/</span>c<span class="operator">));</span><span class="flow">
+    else
+        return</span><span class="int"> 0</span><span class="operator">;
+}</span><span class="type">
+
+void</span> on_trackbar<span class="operator">(</span><span class="type">int</span><span class="operator">,</span><span class="type"> void</span><span class="operator">*){</span>
+    tcima<span class="operator"> =</span> h_slider<span class="operator">-</span>t_slider<span class="operator">;</span><span class="comment">//tamanho de cima
+</span>    tbaixo<span class="operator"> =</span> h_slider<span class="operator">+</span>t_slider<span class="operator">;</span><span class="comment">//tamanho de cima
+</span><span class="operator">}</span><span class="type">
+
+int</span><span class="keyword"> main</span><span class="operator">(</span><span class="type">int</span> argvc<span class="operator">,</span><span class="type"> char</span><span class="operator">**</span> argv<span class="operator">){</span>
+    Mat image<span class="operator">,</span> imageBor<span class="operator">,</span> blended<span class="operator">,</span> imageHSV<span class="operator">;</span>
+    VideoCapture cap<span class="operator">(</span><span class="string">"../images/video.avi"</span><span class="operator">);</span>
+    VideoWriter videoResult<span class="operator">;</span>
+    videoResult<span class="operator">.</span>open<span class="operator">(</span><span class="string">"videoResult.avi"</span><span class="operator">,</span> CV_FOURCC<span class="operator">(</span><span class="char">'M'</span><span class="operator">,</span><span class="char">'J'</span><span class="operator">,</span><span class="char">'P'</span><span class="operator">,</span><span class="char">'G'</span><span class="operator">),</span><span class="int"> 15</span><span class="operator">,</span> Size<span class="operator">(</span><span class="int">640</span><span class="operator">,</span><span class="int">480</span><span class="operator">));</span>
+
+    cap<span class="operator"> &gt;&gt;</span> image<span class="operator">;</span><span class="comment">//frame
+</span>    resize<span class="operator">(</span>image<span class="operator">,</span>image<span class="operator">,</span>Size<span class="operator">(</span><span class="int">640</span><span class="operator">,</span><span class="int">480</span><span class="operator">));</span>
+    imageBor<span class="operator"> =</span> image<span class="operator">.</span>clone<span class="operator">();</span><span class="comment">
+//    imageBor = Mat::zeros(image.size(), CV_8UC3); //para teste
+
+    //Aplicando o filtro gaussiano
+</span><span class="flow">    for</span><span class="operator">(</span><span class="type">int</span> i<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> i<span class="operator">&lt;</span><span class="int">10</span><span class="operator">;</span> i<span class="operator">++)</span>
+        GaussianBlur<span class="operator">(</span>imageBor<span class="operator">,</span> imageBor<span class="operator">,</span> Size<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int">3</span><span class="operator">),</span><span class="int">0</span><span class="operator">,</span><span class="int">0</span><span class="operator">);</span>
+
+    namedWindow<span class="operator">(</span><span class="string">"window"</span><span class="operator">,</span><span class="int"> 1</span><span class="operator">);</span><span class="comment">
+    //altura maxima
+</span>    h_max<span class="operator"> =</span> image<span class="operator">.</span>size<span class="operator">().</span>height<span class="operator">;</span>
+    createTrackbar<span class="operator">(</span><span class="string">"Altura:"</span><span class="operator">,</span><span class="string"> "window"</span><span class="operator">, &amp;</span>h_slider<span class="operator">,</span> h_max<span class="operator">,</span> on_trackbar<span class="operator">);</span>
+    on_trackbar<span class="operator">(</span>h_slider<span class="operator">,</span><span class="int"> 0</span><span class="operator">);</span><span class="comment">
+
+    //tamanho maximo da janela de foco
+</span>    t_max<span class="operator"> =</span> image<span class="operator">.</span>size<span class="operator">().</span>height<span class="operator">;</span>
+    createTrackbar<span class="operator">(</span><span class="string">"Largura:"</span><span class="operator">,</span><span class="string"> "window"</span><span class="operator">, &amp;</span>t_slider<span class="operator">,</span> t_max<span class="operator">,</span> on_trackbar<span class="operator">);</span>
+    on_trackbar<span class="operator">(</span>t_slider<span class="operator">,</span><span class="int"> 0</span><span class="operator">);</span><span class="comment">
+
+    //Nivel do desfoque
+</span>    createTrackbar<span class="operator">(</span><span class="string">"Alpha:"</span><span class="operator">,</span><span class="string"> "window"</span><span class="operator">, &amp;</span>alfa_slider<span class="operator">,</span> alfa_slider_max<span class="operator">);</span><span class="flow">
+
+    while</span><span class="operator"> (</span><span class="int">1</span><span class="operator">){</span><span class="comment">
+
+        //convertendo para HSV
+</span>        cvtColor<span class="operator">(</span>image<span class="operator">,</span> imageHSV<span class="operator">,</span> CV_BGR2HSV<span class="operator">);</span>
+        vector<span class="operator">&lt;</span>Mat<span class="operator">&gt;</span> planes<span class="operator">;</span>
+        split<span class="operator">(</span>imageHSV<span class="operator">,</span> planes<span class="operator">);</span>
+
+        planes<span class="operator">[</span><span class="int">1</span><span class="operator">]*=</span><span class="int">3</span><span class="operator">;</span><span class="comment">//mudando saturaçao
+</span>
+        merge<span class="operator">(</span>planes<span class="operator">,</span> imageHSV<span class="operator">);</span><span class="comment">//juntando os planos
+</span>        cvtColor<span class="operator">(</span>imageHSV<span class="operator">,</span>image<span class="operator">,</span>CV_HSV2BGR<span class="operator">);</span>
+
+        imageBor<span class="operator"> =</span> image<span class="operator">.</span>clone<span class="operator">();</span>
+        blended<span class="operator"> =</span> Mat<span class="operator">::</span>zeros<span class="operator">(</span>image<span class="operator">.</span>size<span class="operator">(),</span> CV_8UC3<span class="operator">);</span><span class="comment">
+
+        //Aplicando o filtro gaussiano
+</span><span class="flow">        for</span><span class="operator">(</span><span class="type">int</span> i<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> i<span class="operator">&lt;</span><span class="int">10</span><span class="operator">;</span> i<span class="operator">++)</span>
+            GaussianBlur<span class="operator">(</span>imageBor<span class="operator">,</span> imageBor<span class="operator">,</span> Size<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int">3</span><span class="operator">),</span><span class="int">0</span><span class="operator">,</span><span class="int">0</span><span class="operator">);</span><span class="comment">
+
+        //imagem resultante
+</span><span class="flow">        for</span><span class="operator">(</span><span class="type">int</span> i<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> i<span class="operator">&lt;</span>image<span class="operator">.</span>size<span class="operator">().</span>height<span class="operator">;</span> i<span class="operator">++)</span>
+            addWeighted<span class="operator">(</span>image<span class="operator">.</span>row<span class="operator">(</span>i<span class="operator">),</span>tiltshift<span class="operator">(</span>i<span class="operator">,</span>tcima<span class="operator">,</span>tbaixo<span class="operator">,</span>alfa_slider<span class="operator">),</span>
+                        imageBor<span class="operator">.</span>row<span class="operator">(</span>i<span class="operator">),</span><span class="int">1</span><span class="operator">-</span>tiltshift<span class="operator">(</span>i<span class="operator">,</span>tcima<span class="operator">,</span>tbaixo<span class="operator">,</span>alfa_slider<span class="operator">),</span><span class="int">0</span><span class="operator">,</span>blended<span class="operator">.</span>row<span class="operator">(</span>i<span class="operator">));</span>
+
+        videoResult<span class="operator"> &lt;&lt;</span> blended<span class="operator">;</span>
+        imshow<span class="operator">(</span><span class="string">"window"</span><span class="operator">,</span>blended<span class="operator">);</span><span class="flow">
+
+        for</span><span class="operator">(</span><span class="type">int</span> i<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> i<span class="operator">&lt;=</span><span class="int">4</span><span class="operator">;</span> i<span class="operator">++)</span>
+            cap<span class="operator"> &gt;&gt;</span> image<span class="operator">;</span><span class="flow">
+
+        if</span><span class="operator">(</span>image<span class="operator">.</span>empty<span class="operator">())</span><span class="flow">
+            break</span><span class="operator">;</span>
+        resize<span class="operator">(</span>image<span class="operator">,</span>image<span class="operator">,</span>Size<span class="operator">(</span><span class="int">640</span><span class="operator">,</span><span class="int">480</span><span class="operator">));</span><span class="flow">
+
+        if</span><span class="operator">(</span>waitKey<span class="operator">(</span><span class="int">30</span><span class="operator">)==</span><span class="int">27</span><span class="operator">)</span><span class="flow"> break</span><span class="operator">;
+    }</span>
+    videoResult<span class="operator">.</span>release<span class="operator">();</span>
+    imwrite<span class="operator">(</span><span class="string">"blended.jpg"</span><span class="operator">,</span>blended<span class="operator">);</span><span class="flow">
+
+    return</span><span class="int"> 0</span><span class="operator">;
+}</span></pre>
