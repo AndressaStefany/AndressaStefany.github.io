@@ -6,6 +6,17 @@
 using namespace cv;
 using namespace std;
 
+int gl = 12, gh= 22, d0= 51, c= 100;
+int gl_max=10, gh_max=100, d0_max=100, c_max=200;
+VideoCapture cap;
+Mat imaginaryInput, complexImage, multsp;
+Mat padded, filter, mag;
+Mat image, imagegray, tmp;
+Mat_<float> realInput, zeros;
+vector<Mat> planos;
+char key;
+int dft_M, dft_N;
+
 // troca os quadrantes da imagem da DFT
 void deslocaDFT(Mat& image ){
     Mat tmp, A, B, C, D;
@@ -31,25 +42,30 @@ void deslocaDFT(Mat& image ){
     C.copyTo(tmp);  B.copyTo(C);  tmp.copyTo(B);
 }
 
+void filterHomo(int, void*){
+    // cria uma matriz temporária para criar as componentes real
+    // e imaginaria do filtro ideal
+    tmp = Mat(dft_M, dft_N, CV_32F);
+
+    // prepara o filtro homomorfico
+    for(int i=0; i<dft_M; i++){
+        for(int j=0; j<dft_N; j++){
+            tmp.at<float> (i,j) = (gh-gl)*(1-exp(-c*(( (i-dft_M/2)*(i-dft_M/2)+(j-dft_N/2)*(j-dft_N/2) ))/(d0*d0) ))+gl;
+        }
+    }
+    Mat comps[]= {tmp, tmp};
+    imshow("filtro",tmp);
+    merge(comps, 2, filter);
+}
+
 int main(int , char**){
-    VideoCapture cap;
-    Mat imaginaryInput, complexImage, multsp;
-    Mat padded, filter, mag;
-    Mat image, imagegray, tmp;
-    Mat_<float> realInput, zeros;
-    vector<Mat> planos;
-    // guarda tecla capturada
-    char key;
-    int gl = 12, gh= 22, d0= 51, c= 100;//MUDAR
-
-    // valores ideais dos tamanhos da imagem
-    // para calculo da DFT
-    int dft_M, dft_N;
-
     // abre a câmera default
     cap.open(0);
     if(!cap.isOpened())
         return -1;
+
+
+
 
     // captura uma imagem para recuperar as
     // informacoes de gravação
@@ -76,23 +92,18 @@ int main(int , char**){
     // mesmo tamanho e tipo da matriz complexa
     filter = complexImage.clone();
 
-    // cria uma matriz temporária para criar as componentes real
-    // e imaginaria do filtro ideal
-    tmp = Mat(dft_M, dft_N, CV_32F);
-
-    // prepara o filtro homomorfico
-    for(int i=0; i<dft_M; i++){
-        for(int j=0; j<dft_N; j++){
-                tmp.at<float> (i,j) = (gh-gl)*(1-exp(-c*(( (i-dft_M/2)*(i-dft_M/2)+(j-dft_N/2)*(j-dft_N/2) ))/(d0*d0) ))+gl;
-        }
-    }
-    imshow("filtrada", tmp);
-
-    waitKey();
+//    filterHomo();
     // cria a matriz com as componentes do filtro e junta
     // ambas em uma matriz multicanal complexa
-    Mat comps[]= {tmp, tmp};
-    merge(comps, 2, filter);
+//    Mat comps[]= {tmp, tmp};
+//    merge(comps, 2, filter);
+
+    //cria janela e sliders
+    namedWindow("filtrada", CV_WINDOW_AUTOSIZE);
+    createTrackbar("Gamma H:", "filtrada", &gl, gl_max, filterHomo);
+    createTrackbar("Gamma L:", "filtrada", &gh, gh_max, filterHomo);
+    createTrackbar("D0:", "filtrada", &d0, d0_max,filterHomo);
+    createTrackbar("C:", "filtrada", &c, c_max, filterHomo);
 
     for(;;){
         cap >> image;
@@ -110,6 +121,8 @@ int main(int , char**){
         planos.clear();
         // cria a compoente real
         realInput = Mat_<float>(padded);
+        //evitar log(0)
+        realInput += Scalar::all(1);
         // aplicando o ln na parte real
         log(realInput,realInput);
         // insere as duas componentes no array de matrizes
