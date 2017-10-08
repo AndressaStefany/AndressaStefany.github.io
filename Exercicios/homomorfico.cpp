@@ -9,8 +9,7 @@ using namespace std;
 int gl = 12, gh= 22, d0= 51, c= 100;
 int gl_max=10, gh_max=100, d0_max=100, c_max=200;
 VideoCapture cap;
-Mat imaginaryInput, complexImage, multsp;
-Mat padded, filter, mag;
+Mat padded, filter, complexImage;
 Mat image, imagegray, tmp;
 Mat_<float> realInput, zeros;
 vector<Mat> planos;
@@ -63,10 +62,6 @@ int main(int , char**){
     cap.open(0);
     if(!cap.isOpened())
         return -1;
-
-
-
-
     // captura uma imagem para recuperar as
     // informacoes de gravação
     cap >> image;
@@ -91,12 +86,6 @@ int main(int , char**){
     // a função de transferência (filtro frequencial) deve ter o
     // mesmo tamanho e tipo da matriz complexa
     filter = complexImage.clone();
-
-//    filterHomo();
-    // cria a matriz com as componentes do filtro e junta
-    // ambas em uma matriz multicanal complexa
-//    Mat comps[]= {tmp, tmp};
-//    merge(comps, 2, filter);
 
     //cria janela e sliders
     namedWindow("filtrada", CV_WINDOW_AUTOSIZE);
