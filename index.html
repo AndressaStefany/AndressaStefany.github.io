@@ -26,6 +26,8 @@
             $("#motiondetector").load("motiondetector.html");
             $("#tiltshift").load("tfoto.html");
             $("#tiltshiftvideo").load("tvideo.html");
+            $("#frequenciahtml").load("homomorfico.html");
+            $("#pontiCarryhtml").load("pontCarry.html");
         });
     </script>
 
@@ -74,6 +76,10 @@
                         <li><a href="#espacial2">Domínio Espacial II</a></li>
                         <li class="dropdown-header"><a href="#foto">Foto</a></li>
                         <li class="dropdown-header"><a href="#video">Vídeo</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#frequencia">Filtro Homomórfico</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#pontiCarry">Carry e Pontilhismo</a></li>
                     </ul>
                 </li>
             </ul>
@@ -277,6 +283,58 @@
         </video>
     </div>
 
+    <br>
+    <h2 id="frequencia">Filtragem no Domínio da Frequência</h2>
+    <h2 class="blog-post-title">Filtro Homomórfico</h2>
+    <br>
+    <p>Utilizando o programa <a href="CódigosDoProfessor/dft.cpp">exemplos/dft.cpp</a> como referência, implemente o filtro homomórfico para melhorar imagens com iluminação
+        irregular. Crie uma cena mal iluminada e ajuste os parâmetros do filtro homomórfico para corrigir a iluminação da melhor forma
+        possível. Assuma que a imagem fornecida é em tons de cinza.</p>
+
+    <br>
+    <div id="frequenciahtml"></div>
+    <br>
+    <p>Resultado:</p>
+    <br>
+    <img class="img-responsive" src="images/result_homo.png" height="1000px">
+
+    <br>
+    <h2 id="pontiCarry">Filtro Carry e Pontilhismo</h2>
+    <h2 class="blog-post-title">Canny e a arte com pontilhismo</h2>
+    <br>
+    <p>Utilizando os programas <a href="CódigosDoProfessor/canny.cpp">exemplos/canny.cpp</a> e
+        <a href="CódigosDoProfessor/pontilhismo.cpp">exemplos/pontilhismo.cpp</a> como referência, implemente um programa
+        <i>cannypoints.cpp</i>. A idéia é usar as bordas produzidas pelo algoritmo de Canny para melhorar a qualidade da imagem
+        pontilhista gerada. A forma como a informação de borda será usada é livre.</p>
+
+    <br>
+    <div id="pontiCarryhtml"></div>
+    <br>
+    <p>Resultado:</p>
+    <br>
+    <div class="row">
+        <div class="col-lg-12 col-xs-12">
+            <div class="col-lg-6 col-xs-12">
+                <p>Imagem original:</p>
+                <img class="img-responsive" src="images/itapaje.jpg" height="1000px">
+            </div>
+            <div class="col-lg-6 col-xs-12">
+                <p>Apenas com o Canny:</p>
+                <img class="img-responsive" src="images/imageCanny.jpg" height="1000px">
+            </div>
+        </div>
+
+        <div class="col-lg-12 col-xs-12 top-padding2">
+            <div class="col-lg-6 col-xs-12">
+                <p>Utilizando pontilhismo.cpp:</p>
+                <img class="img-responsive" src="images/semCanny.jpg" height="1000px">
+            </div>
+            <div class="col-lg-6 col-xs-12">
+                <p>Pontilhismo com o Canny:</p>
+                <img class="img-responsive" src="images/comCanny.jpg" height="1000px">
+            </div>
+        </div>
+    </div>
     <div class="figure">
         <img src="images/separador.png" width="200">
     </div>
