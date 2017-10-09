@@ -27,7 +27,7 @@
             $("#tiltshift").load("tfoto.html");
             $("#tiltshiftvideo").load("tvideo.html");
             $("#frequenciahtml").load("homomorfico.html");
-            $("#pontiCarryhtml").load("pontCarry.html");
+            $("#pontihtml").load("pontCanny.html");
         });
     </script>
 
@@ -79,7 +79,7 @@
                         <li role="separator" class="divider"></li>
                         <li><a href="#frequencia">Filtro Homomórfico</a></li>
                         <li role="separator" class="divider"></li>
-                        <li><a href="#pontiCarry">Carry e Pontilhismo</a></li>
+                        <li><a href="#pontiCanny">Canny e Pontilhismo</a></li>
                     </ul>
                 </li>
             </ul>
@@ -299,16 +299,21 @@
     <img class="img-responsive" src="images/result_homo.png" height="1000px">
 
     <br>
-    <h2 id="pontiCarry">Filtro Carry e Pontilhismo</h2>
-    <h2 class="blog-post-title">Canny e a arte com pontilhismo</h2>
+    <h2 id="pontiCanny">Filtro Canny e Pontilhismo</h2>
+    <h2 class="blog-post-title">Canny e a Arte com Pontilhismo</h2>
     <br>
     <p>Utilizando os programas <a href="CódigosDoProfessor/canny.cpp">exemplos/canny.cpp</a> e
         <a href="CódigosDoProfessor/pontilhismo.cpp">exemplos/pontilhismo.cpp</a> como referência, implemente um programa
         <i>cannypoints.cpp</i>. A idéia é usar as bordas produzidas pelo algoritmo de Canny para melhorar a qualidade da imagem
         pontilhista gerada. A forma como a informação de borda será usada é livre.</p>
+    <p><b>Estratégia:</b> Primeiro, foi gerada a imagem utilizando o código <a href="CódigosDoProfessor/pontilhismo.cpp">
+        pontilhismo.cpp</a>. Em seguida, foi gerada uma imagem usando o filtro Canny, dessa forma,
+        obteve-se os pontos que representam bordas na imagem, com isso, a imagem foi percorrida
+        novamente e onde é identificado como um ponto de borda, foi utilizado uma raio 1 para a técnica
+        do pontilhismo, fazendo com que os detalhes da imagem pudessem ser realçados.</p>
 
     <br>
-    <div id="pontiCarryhtml"></div>
+    <div id="pontihtml"></div>
     <br>
     <p>Resultado:</p>
     <br>
@@ -333,50 +338,52 @@
                 <p>Pontilhismo com o Canny:</p>
                 <img class="img-responsive" src="images/comCanny.jpg" height="1000px">
             </div>
+            <div class="col-lg-12 col-xs-12">
+                <p class="top-padding2" style="color: #8c8c8c">*Local: Itapajé-CE.</p>
+            </div>
         </div>
-    </div>
-    <div class="figure">
-        <img src="images/separador.png" width="200">
-    </div>
+        <div class="figure">
+            <img src="images/separador.png" width="200">
+        </div>
 
-    <h2 id="sobre">Sobre</h2>
-    <br>
-    <p>Esse site foi feito para apresentar os exercícios da disciplina de Processamento Digital
-        de Imagens da UFRN, propostos no seguinte site:
-        <a href="http://agostinhobritojr.github.io/"> link </a>,
-        fazendo uso do <a href="http://docs.opencv.org/2.4/">OpenCV</a>.</p>
+        <h2 id="sobre">Sobre</h2>
+        <br>
+        <p>Esse site foi feito para apresentar os exercícios da disciplina de Processamento Digital
+            de Imagens da UFRN, propostos no seguinte site:
+            <a href="http://agostinhobritojr.github.io/"> link </a>,
+            fazendo uso do <a href="http://docs.opencv.org/2.4/">OpenCV</a>.</p>
 
-    <div class="figure">
-        <img src="images/separador.png" width="200">
-    </div>
+        <div class="figure">
+            <img src="images/separador.png" width="200">
+        </div>
 
-    <h2 id="contato">Contato</h2>
-    <br>
-    <p>Linkedin:
-        <a href="https://www.linkedin.com/in/andressa-st%C3%A9fany-01175263/">
-            Andressa Stéfany
-        </a>
-    </p>
-    <p>E-mail: astefanysoliveira@gmail.com</p>
+        <h2 id="contato">Contato</h2>
+        <br>
+        <p>Linkedin:
+            <a href="https://www.linkedin.com/in/andressa-st%C3%A9fany-01175263/">
+                Andressa Stéfany
+            </a>
+        </p>
+        <p>E-mail: astefanysoliveira@gmail.com</p>
 
-    <div class="figure">
-        <img src="images/separador.png" width="200">
-    </div>
+        <div class="figure">
+            <img src="images/separador.png" width="200">
+        </div>
 
-    <div class="footer things-center" style="padding-top:3%; padding-bottom: 3%">
-        PDI © 2017 <br>
-        <a href="http://getbootstrap.com/">Bootstrap</a> |
-        <a href="http://www.freepik.com">Freepik</a>
-    </div>
-
-
-</div> <!-- /container -->
+        <div class="footer things-center" style="padding-top:3%; padding-bottom: 3%">
+            PDI © 2017 <br>
+            <a href="http://getbootstrap.com/">Bootstrap</a> |
+            <a href="http://www.freepik.com">Freepik</a>
+        </div>
 
 
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="./bootstrap/docs/dist/js/bootstrap.min.js"></script>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="./bootstrap/docs/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
