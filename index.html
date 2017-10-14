@@ -306,11 +306,13 @@
         <a href="CódigosDoProfessor/pontilhismo.cpp">exemplos/pontilhismo.cpp</a> como referência, implemente um programa
         <i>cannypoints.cpp</i>. A idéia é usar as bordas produzidas pelo algoritmo de Canny para melhorar a qualidade da imagem
         pontilhista gerada. A forma como a informação de borda será usada é livre.</p>
-    <p><b>Estratégia:</b> Primeiro, foi gerada a imagem utilizando o código <a href="CódigosDoProfessor/pontilhismo.cpp">
+    <p><b>Estratégia:</b> Primeiro, foi gerada a imagem utilizando o mesmo efeito do código
+        <a href="CódigosDoProfessor/pontilhismo.cpp">
         pontilhismo.cpp</a>. Em seguida, foi gerada uma imagem usando o filtro Canny, dessa forma,
-        obteve-se os pontos que representam bordas na imagem, com isso, a imagem foi percorrida
-        novamente e onde é identificado como um ponto de borda, foi utilizado uma raio 1 para a técnica
-        do pontilhismo, fazendo com que os detalhes da imagem pudessem ser realçados.</p>
+        obteve-se os pontos que representam bordas na imagem, com isso, a imagem obtida através do Canny
+        foi percorrida novamente para se ter conhecimento da localização dos pontos de borda e, posteriormente,
+        esses pontos foram pintados mais uma vez na imagem gerada anteriormente pelo pontilhismo, porém, foi
+        utilizado raio 1, fazendo com que os detalhes da imagem pudessem ser realçados.</p>
 
     <br>
     <div id="pontihtml"></div>
