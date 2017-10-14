@@ -6,19 +6,20 @@
 using namespace</span> cv<span class="operator">;</span><span class="keyword">
 using namespace</span> std<span class="operator">;</span><span class="type">
 
-int</span> gl<span class="operator"> =</span><span class="int"> 12</span><span class="operator">,</span> gh<span class="operator">=</span><span class="int"> 22</span><span class="operator">,</span> d0<span class="operator">=</span><span class="int"> 51</span><span class="operator">,</span> c<span class="operator">=</span><span class="int"> 100</span><span class="operator">;</span><span class="type">
-int</span> gl_max<span class="operator">=</span><span class="int">10</span><span class="operator">,</span> gh_max<span class="operator">=</span><span class="int">100</span><span class="operator">,</span> d0_max<span class="operator">=</span><span class="int">100</span><span class="operator">,</span> c_max<span class="operator">=</span><span class="int">200</span><span class="operator">;</span>
-VideoCapture cap<span class="operator">;</span>
+int</span> gl<span class="operator">,</span> gh<span class="operator">,</span> d0<span class="operator">,</span> c<span class="operator">;</span><span class="type">
+int</span> gl_max<span class="operator">=</span><span class="int">100</span><span class="operator">,</span> gh_max<span class="operator">=</span><span class="int">100</span><span class="operator">,</span> d0_max<span class="operator">=</span><span class="int">100</span><span class="operator">,</span> c_max<span class="operator">=</span><span class="int">100</span><span class="operator">;</span>
+
 Mat padded<span class="operator">,</span> filter<span class="operator">,</span> complexImage<span class="operator">;</span>
 Mat image<span class="operator">,</span> imagegray<span class="operator">,</span> tmp<span class="operator">;</span>
 Mat_<span class="operator">&lt;</span><span class="type">float</span><span class="operator">&gt;</span> realInput<span class="operator">,</span> zeros<span class="operator">;</span>
 vector<span class="operator">&lt;</span>Mat<span class="operator">&gt;</span> planos<span class="operator">;</span><span class="type">
+
 char</span> key<span class="operator">;</span><span class="type">
 int</span> dft_M<span class="operator">,</span> dft_N<span class="operator">;</span><span class="comment">
 
 // troca os quadrantes da imagem da DFT
 </span><span class="type">void</span> deslocaDFT<span class="operator">(</span>Mat<span class="operator">&amp;</span> image<span class="operator"> ){</span>
-    Mat tmp<span class="operator">,</span> A<span class="operator">,</span> B<span class="operator">,</span> C<span class="operator">,</span> D<span class="operator">;</span><span class="comment">
+    Mat tmp2<span class="operator">,</span> A<span class="operator">,</span> B<span class="operator">,</span> C<span class="operator">,</span> D<span class="operator">;</span><span class="comment">
 
     // se a imagem tiver tamanho impar, recorta a regiao para
     // evitar cópias de tamanho desigual
@@ -35,21 +36,26 @@ int</span> dft_M<span class="operator">,</span> dft_N<span class="operator">;</s
     D<span class="operator"> =</span> image<span class="operator">(</span>Rect<span class="operator">(</span>cx<span class="operator">,</span> cy<span class="operator">,</span> cx<span class="operator">,</span> cy<span class="operator">));</span><span class="comment">
 
     // A &lt;-&gt; D
-</span>    A<span class="operator">.</span>copyTo<span class="operator">(</span>tmp<span class="operator">);</span>  D<span class="operator">.</span>copyTo<span class="operator">(</span>A<span class="operator">);</span>  tmp<span class="operator">.</span>copyTo<span class="operator">(</span>D<span class="operator">);</span><span class="comment">
+</span>    A<span class="operator">.</span>copyTo<span class="operator">(</span>tmp2<span class="operator">);</span>  D<span class="operator">.</span>copyTo<span class="operator">(</span>A<span class="operator">);</span>  tmp2<span class="operator">.</span>copyTo<span class="operator">(</span>D<span class="operator">);</span><span class="comment">
 
     // C &lt;-&gt; B
-</span>    C<span class="operator">.</span>copyTo<span class="operator">(</span>tmp<span class="operator">);</span>  B<span class="operator">.</span>copyTo<span class="operator">(</span>C<span class="operator">);</span>  tmp<span class="operator">.</span>copyTo<span class="operator">(</span>B<span class="operator">);
+</span>    C<span class="operator">.</span>copyTo<span class="operator">(</span>tmp2<span class="operator">);</span>  B<span class="operator">.</span>copyTo<span class="operator">(</span>C<span class="operator">);</span>  tmp2<span class="operator">.</span>copyTo<span class="operator">(</span>B<span class="operator">);
 }</span><span class="type">
 
 void</span> filterHomo<span class="operator">(</span><span class="type">int</span><span class="operator">,</span><span class="type"> void</span><span class="operator">*){</span><span class="comment">
-    // cria uma matriz temporária para criar as componentes real
-    // e imaginaria do filtro ideal
-</span>    tmp<span class="operator"> =</span> Mat<span class="operator">(</span>dft_M<span class="operator">,</span> dft_N<span class="operator">,</span> CV_32F<span class="operator">);</span><span class="comment">
+    // gh, gl e d0 variam de 0 a 10
+</span><span class="type">    double</span> gh_calc<span class="operator"> =</span> gh<span class="operator">/</span><span class="float">10.0</span><span class="operator">;</span><span class="type">
+    double</span> gl_calc<span class="operator"> =</span> gl<span class="operator">/</span><span class="float">10.0</span><span class="operator">;</span><span class="type">
+    double</span> d0_calc<span class="operator"> =</span> d0<span class="operator">/</span><span class="float">10.0</span><span class="operator">;</span><span class="type">
+    double</span> c_calc<span class="operator">=</span> c<span class="operator">/</span><span class="float">1000.0</span><span class="operator">;</span><span class="comment"> //de 0 a 0.1
+</span><span class="type">
+    double</span> d<span class="operator">;</span><span class="comment">
 
     // prepara o filtro homomorfico
 </span><span class="flow">    for</span><span class="operator">(</span><span class="type">int</span> i<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> i<span class="operator">&lt;</span>dft_M<span class="operator">;</span> i<span class="operator">++){</span><span class="flow">
         for</span><span class="operator">(</span><span class="type">int</span> j<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> j<span class="operator">&lt;</span>dft_N<span class="operator">;</span> j<span class="operator">++){</span>
-            tmp<span class="operator">.</span>at<span class="operator">&lt;</span><span class="type">float</span><span class="operator">&gt; (</span>i<span class="operator">,</span>j<span class="operator">) = (</span>gh<span class="operator">-</span>gl<span class="operator">)*(</span><span class="int">1</span><span class="operator">-</span>exp<span class="operator">(-</span>c<span class="operator">*(( (</span>i<span class="operator">-</span>dft_M<span class="operator">/</span><span class="int">2</span><span class="operator">)*(</span>i<span class="operator">-</span>dft_M<span class="operator">/</span><span class="int">2</span><span class="operator">)+(</span>j<span class="operator">-</span>dft_N<span class="operator">/</span><span class="int">2</span><span class="operator">)*(</span>j<span class="operator">-</span>dft_N<span class="operator">/</span><span class="int">2</span><span class="operator">) ))/(</span>d0<span class="operator">*</span>d0<span class="operator">) ))+</span>gl<span class="operator">;
+            d<span class="operator"> = (</span>i<span class="operator">-</span>dft_M<span class="operator">/</span><span class="int">2</span><span class="operator">)*(</span>i<span class="operator">-</span>dft_M<span class="operator">/</span><span class="int">2</span><span class="operator">)+(</span>j<span class="operator">-</span>dft_N<span class="operator">/</span><span class="int">2</span><span class="operator">)*(</span>j<span class="operator">-</span>dft_N<span class="operator">/</span><span class="int">2</span><span class="operator">);</span><span class="comment">// d²
+</span>            tmp<span class="operator">.</span>at<span class="operator">&lt;</span><span class="type">float</span><span class="operator">&gt; (</span>i<span class="operator">,</span>j<span class="operator">) = (</span>gh_calc<span class="operator">-</span>gl_calc<span class="operator">)*(</span><span class="int">1</span><span class="operator">-</span>exp<span class="operator">(-</span>c_calc<span class="operator">*</span>d<span class="operator">/(</span>d0_calc<span class="operator">*</span>d0_calc<span class="operator">)))+</span>gl_calc<span class="operator">;
         }
     }</span>
     Mat comps<span class="operator">[]= {</span>tmp<span class="operator">,</span> tmp<span class="operator">};</span>
@@ -58,13 +64,15 @@ void</span> filterHomo<span class="operator">(</span><span class="type">int</spa
 }</span><span class="type">
 
 int</span><span class="keyword"> main</span><span class="operator">(</span><span class="type">int</span><span class="operator"> ,</span><span class="type"> char</span><span class="operator">**){</span><span class="comment">
-    // abre a câmera default
-</span>    cap<span class="operator">.</span>open<span class="operator">(</span><span class="int">0</span><span class="operator">);</span><span class="flow">
-    if</span><span class="operator">(!</span>cap<span class="operator">.</span>isOpened<span class="operator">())</span><span class="flow">
-        return</span><span class="operator"> -</span><span class="int">1</span><span class="operator">;</span><span class="comment">
-    // captura uma imagem para recuperar as
-    // informacoes de gravação
-</span>    cap<span class="operator"> &gt;&gt;</span> image<span class="operator">;</span><span class="comment">
+    //cria janela e sliders
+</span>    namedWindow<span class="operator">(</span><span class="string">"filtrada"</span><span class="operator">,</span> CV_WINDOW_AUTOSIZE<span class="operator">);</span>
+    createTrackbar<span class="operator">(</span><span class="string">"Gamma H:"</span><span class="operator">,</span><span class="string"> "filtrada"</span><span class="operator">, &amp;</span>gh<span class="operator">,</span> gh_max<span class="operator">,</span> filterHomo<span class="operator">);</span>
+    createTrackbar<span class="operator">(</span><span class="string">"Gamma L:"</span><span class="operator">,</span><span class="string"> "filtrada"</span><span class="operator">, &amp;</span>gl<span class="operator">,</span> gl_max<span class="operator">,</span> filterHomo<span class="operator">);</span>
+    createTrackbar<span class="operator">(</span><span class="string">"D0:"</span><span class="operator">,</span><span class="string"> "filtrada"</span><span class="operator">, &amp;</span>d0<span class="operator">,</span> d0_max<span class="operator">,</span>filterHomo<span class="operator">);</span>
+    createTrackbar<span class="operator">(</span><span class="string">"C:"</span><span class="operator">,</span><span class="string"> "filtrada"</span><span class="operator">, &amp;</span>c<span class="operator">,</span> c_max<span class="operator">,</span> filterHomo<span class="operator">);</span><span class="comment">
+
+    // ler imagem para filtragem
+</span>    image<span class="operator"> =</span> imread<span class="operator">(</span><span class="string">"../images/cents.jpg"</span><span class="operator">,</span> CV_LOAD_IMAGE_GRAYSCALE<span class="operator">);</span><span class="comment">
 
     // identifica os tamanhos otimos para
     // calculo do FFT
@@ -86,17 +94,12 @@ int</span><span class="keyword"> main</span><span class="operator">(</span><span
     // a função de transferência (filtro frequencial) deve ter o
     // mesmo tamanho e tipo da matriz complexa
 </span>    filter<span class="operator"> =</span> complexImage<span class="operator">.</span>clone<span class="operator">();</span><span class="comment">
-
-    //cria janela e sliders
-</span>    namedWindow<span class="operator">(</span><span class="string">"filtrada"</span><span class="operator">,</span> CV_WINDOW_AUTOSIZE<span class="operator">);</span>
-    createTrackbar<span class="operator">(</span><span class="string">"Gamma H:"</span><span class="operator">,</span><span class="string"> "filtrada"</span><span class="operator">, &amp;</span>gl<span class="operator">,</span> gl_max<span class="operator">,</span> filterHomo<span class="operator">);</span>
-    createTrackbar<span class="operator">(</span><span class="string">"Gamma L:"</span><span class="operator">,</span><span class="string"> "filtrada"</span><span class="operator">, &amp;</span>gh<span class="operator">,</span> gh_max<span class="operator">,</span> filterHomo<span class="operator">);</span>
-    createTrackbar<span class="operator">(</span><span class="string">"D0:"</span><span class="operator">,</span><span class="string"> "filtrada"</span><span class="operator">, &amp;</span>d0<span class="operator">,</span> d0_max<span class="operator">,</span>filterHomo<span class="operator">);</span>
-    createTrackbar<span class="operator">(</span><span class="string">"C:"</span><span class="operator">,</span><span class="string"> "filtrada"</span><span class="operator">, &amp;</span>c<span class="operator">,</span> c_max<span class="operator">,</span> filterHomo<span class="operator">);</span><span class="flow">
+    // cria uma matriz temporária para criar as componentes real
+    // e imaginaria do filtro ideal
+</span>    tmp<span class="operator"> =</span> Mat<span class="operator">(</span>dft_M<span class="operator">,</span> dft_N<span class="operator">,</span> CV_32F<span class="operator">);</span><span class="flow">
 
     for</span><span class="operator">(;;){</span>
-        cap<span class="operator"> &gt;&gt;</span> image<span class="operator">;</span>
-        cvtColor<span class="operator">(</span>image<span class="operator">,</span> imagegray<span class="operator">,</span> CV_BGR2GRAY<span class="operator">);</span>
+        imagegray<span class="operator"> =</span> image<span class="operator">.</span>clone<span class="operator">();</span>
         imshow<span class="operator">(</span><span class="string">"original"</span><span class="operator">,</span> imagegray<span class="operator">);</span><span class="comment">
 
         // realiza o padding da imagem
@@ -112,7 +115,7 @@ int</span><span class="keyword"> main</span><span class="operator">(</span><span
 </span>        realInput<span class="operator"> =</span> Mat_<span class="operator">&lt;</span><span class="type">float</span><span class="operator">&gt;(</span>padded<span class="operator">);</span><span class="comment">
         //evitar log(0)
 </span>        realInput<span class="operator"> +=</span> Scalar<span class="operator">::</span>all<span class="operator">(</span><span class="int">1</span><span class="operator">);</span><span class="comment">
-        // aplicando o ln na parte real
+        // aplicando o log na parte real
 </span>        log<span class="operator">(</span>realInput<span class="operator">,</span>realInput<span class="operator">);</span><span class="comment">
         // insere as duas componentes no array de matrizes
 </span>        planos<span class="operator">.</span>push_back<span class="operator">(</span>realInput<span class="operator">);</span>
@@ -131,18 +134,9 @@ int</span><span class="keyword"> main</span><span class="operator">(</span><span
         // aplica o filtro frequencial
 </span>        mulSpectrums<span class="operator">(</span>complexImage<span class="operator">,</span>filter<span class="operator">,</span>complexImage<span class="operator">,</span><span class="int">0</span><span class="operator">);</span><span class="comment">
 
-        // limpa o array de planos
-</span>        planos<span class="operator">.</span>clear<span class="operator">();</span><span class="comment">
-        // separa as partes real e imaginaria para modifica-las
-</span>        split<span class="operator">(</span>complexImage<span class="operator">,</span> planos<span class="operator">);</span><span class="comment">
-
-        // recompoe os planos em uma unica matriz complexa
-</span>        merge<span class="operator">(</span>planos<span class="operator">,</span> complexImage<span class="operator">);</span><span class="comment">
-
         // troca novamente os quadrantes
-</span>        deslocaDFT<span class="operator">(</span>complexImage<span class="operator">);</span>
+</span>        deslocaDFT<span class="operator">(</span>complexImage<span class="operator">);</span><span class="comment">
 
-        cout<span class="operator"> &lt;&lt;</span> complexImage<span class="operator">.</span>size<span class="operator">().</span>height<span class="operator"> &lt;&lt;</span> endl<span class="operator">;</span><span class="comment">
         // calcula a DFT inversa
 </span>        idft<span class="operator">(</span>complexImage<span class="operator">,</span> complexImage<span class="operator">);</span><span class="comment">
 
@@ -153,13 +147,30 @@ int</span><span class="keyword"> main</span><span class="operator">(</span><span
         // imagem filtrada
 </span>        split<span class="operator">(</span>complexImage<span class="operator">,</span> planos<span class="operator">);</span><span class="comment">
 
+        // exponencial
+</span>        exp<span class="operator">(</span>planos<span class="operator">[</span><span class="int">0</span><span class="operator">],</span> planos<span class="operator">[</span><span class="int">0</span><span class="operator">]);</span><span class="comment">
+
         // normaliza a parte real para exibicao
 </span>        normalize<span class="operator">(</span>planos<span class="operator">[</span><span class="int">0</span><span class="operator">],</span> planos<span class="operator">[</span><span class="int">0</span><span class="operator">],</span><span class="int"> 0</span><span class="operator">,</span><span class="int"> 1</span><span class="operator">,</span> CV_MINMAX<span class="operator">);</span>
         imshow<span class="operator">(</span><span class="string">"filtrada"</span><span class="operator">,</span> planos<span class="operator">[</span><span class="int">0</span><span class="operator">]);</span>
 
         key<span class="operator"> = (</span><span class="type">char</span><span class="operator">)</span> waitKey<span class="operator">(</span><span class="int">10</span><span class="operator">);</span><span class="flow">
         if</span><span class="operator">(</span> key<span class="operator"> ==</span><span class="int"> 27</span><span class="operator"> )</span><span class="flow"> break</span><span class="operator">;</span><span class="comment"> // esc pressed!
-</span><span class="operator">    }</span><span class="flow">
+</span><span class="operator">    }</span><span class="comment">
+    // salvar img filtrada e filtro
+</span>    Mat final<span class="operator">;</span>
+    planos<span class="operator">[</span><span class="int">0</span><span class="operator">].</span>convertTo<span class="operator">(</span>final<span class="operator">,</span> CV_8UC1<span class="operator">,</span><span class="float"> 255.0</span><span class="operator">);</span>
+    imwrite<span class="operator">(</span><span class="string">"filtrada.png"</span><span class="operator">,</span> final<span class="operator">);</span>
+
+    vector<span class="operator">&lt;</span>Mat<span class="operator">&gt;</span> filtro<span class="operator">;</span>
+    split<span class="operator">(</span>filter<span class="operator">,</span>filtro<span class="operator">);</span>
+    normalize<span class="operator">(</span>filtro<span class="operator">[</span><span class="int">0</span><span class="operator">],</span> filtro<span class="operator">[</span><span class="int">0</span><span class="operator">],</span><span class="int"> 0</span><span class="operator">,</span><span class="int"> 1</span><span class="operator">,</span> CV_MINMAX<span class="operator">);</span>
+
+    filtro<span class="operator">[</span><span class="int">0</span><span class="operator">].</span>convertTo<span class="operator">(</span>final<span class="operator">,</span> CV_8UC1<span class="operator">,</span><span class="float"> 255.0</span><span class="operator">);</span>
+    imwrite<span class="operator">(</span><span class="string">"filtro.png"</span><span class="operator">,</span> final<span class="operator">);</span>
+
+    waitKey<span class="operator">(</span><span class="int">0</span><span class="operator">);</span><span class="flow">
+
     return</span><span class="int"> 0</span><span class="operator">;
 }</span>
 </pre>

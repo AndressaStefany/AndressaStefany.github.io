@@ -6,7 +6,6 @@
 using namespace cv;
 using namespace std;
 
-//int gl = 3, gh= 13, d0 = 41, c= 5;
 int gl, gh, d0, c;
 int gl_max=100, gh_max=100, d0_max=100, c_max=100;
 
@@ -149,8 +148,7 @@ int main(int , char**){
         split(complexImage, planos);
 
         // exponencial
-//        planos[0] -= Scalar::all(1);
-//        exp(planos[0], planos[0]);
+        exp(planos[0], planos[0]);
 
         // normaliza a parte real para exibicao
         normalize(planos[0], planos[0], 0, 1, CV_MINMAX);
@@ -163,12 +161,12 @@ int main(int , char**){
     Mat final;
     planos[0].convertTo(final, CV_8UC1, 255.0);
     imwrite("filtrada.png", final);
-    // mostra parte real do filtro
-    vector<Mat> pFiltro;
-    split(filter,pFiltro);
-    normalize(pFiltro[0], pFiltro[0], 0, 1, CV_MINMAX);
 
-    pFiltro[0].convertTo(final, CV_8UC1, 255.0);
+    vector<Mat> filtro;
+    split(filter,filtro);
+    normalize(filtro[0], filtro[0], 0, 1, CV_MINMAX);
+
+    filtro[0].convertTo(final, CV_8UC1, 255.0);
     imwrite("filtro.png", final);
 
     waitKey(0);
