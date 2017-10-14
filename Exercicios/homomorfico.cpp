@@ -6,19 +6,21 @@
 using namespace cv;
 using namespace std;
 
-int gl = 12, gh= 22, d0= 51, c= 100;
-int gl_max=10, gh_max=100, d0_max=100, c_max=200;
-VideoCapture cap;
+//int gl = 3, gh= 13, d0 = 41, c= 5;
+int gl, gh, d0, c;
+int gl_max=100, gh_max=100, d0_max=100, c_max=100;
+
 Mat padded, filter, complexImage;
 Mat image, imagegray, tmp;
 Mat_<float> realInput, zeros;
 vector<Mat> planos;
+
 char key;
 int dft_M, dft_N;
 
 // troca os quadrantes da imagem da DFT
 void deslocaDFT(Mat& image ){
-    Mat tmp, A, B, C, D;
+    Mat tmp2, A, B, C, D;
 
     // se a imagem tiver tamanho impar, recorta a regiao para
     // evitar cópias de tamanho desigual
@@ -35,21 +37,26 @@ void deslocaDFT(Mat& image ){
     D = image(Rect(cx, cy, cx, cy));
 
     // A <-> D
-    A.copyTo(tmp);  D.copyTo(A);  tmp.copyTo(D);
+    A.copyTo(tmp2);  D.copyTo(A);  tmp2.copyTo(D);
 
     // C <-> B
-    C.copyTo(tmp);  B.copyTo(C);  tmp.copyTo(B);
+    C.copyTo(tmp2);  B.copyTo(C);  tmp2.copyTo(B);
 }
 
 void filterHomo(int, void*){
-    // cria uma matriz temporária para criar as componentes real
-    // e imaginaria do filtro ideal
-    tmp = Mat(dft_M, dft_N, CV_32F);
+    // gh, gl e d0 variam de 0 a 10
+    double gh_calc = gh/10.0;
+    double gl_calc = gl/10.0;
+    double d0_calc = d0/10.0;
+    double c_calc= c/1000.0; //de 0 a 0.1
+
+    double d;
 
     // prepara o filtro homomorfico
     for(int i=0; i<dft_M; i++){
         for(int j=0; j<dft_N; j++){
-            tmp.at<float> (i,j) = (gh-gl)*(1-exp(-c*(( (i-dft_M/2)*(i-dft_M/2)+(j-dft_N/2)*(j-dft_N/2) ))/(d0*d0) ))+gl;
+            d = (i-dft_M/2)*(i-dft_M/2)+(j-dft_N/2)*(j-dft_N/2);// d²
+            tmp.at<float> (i,j) = (gh_calc-gl_calc)*(1-exp(-c_calc*d/(d0_calc*d0_calc)))+gl_calc;
         }
     }
     Mat comps[]= {tmp, tmp};
@@ -58,13 +65,15 @@ void filterHomo(int, void*){
 }
 
 int main(int , char**){
-    // abre a câmera default
-    cap.open(0);
-    if(!cap.isOpened())
-        return -1;
-    // captura uma imagem para recuperar as
-    // informacoes de gravação
-    cap >> image;
+    //cria janela e sliders
+    namedWindow("filtrada", CV_WINDOW_AUTOSIZE);
+    createTrackbar("Gamma H:", "filtrada", &gh, gh_max, filterHomo);
+    createTrackbar("Gamma L:", "filtrada", &gl, gl_max, filterHomo);
+    createTrackbar("D0:", "filtrada", &d0, d0_max,filterHomo);
+    createTrackbar("C:", "filtrada", &c, c_max, filterHomo);
+
+    // ler imagem para filtragem
+    image = imread("../images/cents.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 
     // identifica os tamanhos otimos para
     // calculo do FFT
@@ -86,17 +95,12 @@ int main(int , char**){
     // a função de transferência (filtro frequencial) deve ter o
     // mesmo tamanho e tipo da matriz complexa
     filter = complexImage.clone();
-
-    //cria janela e sliders
-    namedWindow("filtrada", CV_WINDOW_AUTOSIZE);
-    createTrackbar("Gamma H:", "filtrada", &gl, gl_max, filterHomo);
-    createTrackbar("Gamma L:", "filtrada", &gh, gh_max, filterHomo);
-    createTrackbar("D0:", "filtrada", &d0, d0_max,filterHomo);
-    createTrackbar("C:", "filtrada", &c, c_max, filterHomo);
+    // cria uma matriz temporária para criar as componentes real
+    // e imaginaria do filtro ideal
+    tmp = Mat(dft_M, dft_N, CV_32F);
 
     for(;;){
-        cap >> image;
-        cvtColor(image, imagegray, CV_BGR2GRAY);
+        imagegray = image.clone();
         imshow("original", imagegray);
 
         // realiza o padding da imagem
@@ -112,7 +116,7 @@ int main(int , char**){
         realInput = Mat_<float>(padded);
         //evitar log(0)
         realInput += Scalar::all(1);
-        // aplicando o ln na parte real
+        // aplicando o log na parte real
         log(realInput,realInput);
         // insere as duas componentes no array de matrizes
         planos.push_back(realInput);
@@ -131,18 +135,9 @@ int main(int , char**){
         // aplica o filtro frequencial
         mulSpectrums(complexImage,filter,complexImage,0);
 
-        // limpa o array de planos
-        planos.clear();
-        // separa as partes real e imaginaria para modifica-las
-        split(complexImage, planos);
-
-        // recompoe os planos em uma unica matriz complexa
-        merge(planos, complexImage);
-
         // troca novamente os quadrantes
         deslocaDFT(complexImage);
 
-        cout << complexImage.size().height << endl;
         // calcula a DFT inversa
         idft(complexImage, complexImage);
 
@@ -153,6 +148,10 @@ int main(int , char**){
         // imagem filtrada
         split(complexImage, planos);
 
+        // exponencial
+//        planos[0] -= Scalar::all(1);
+//        exp(planos[0], planos[0]);
+
         // normaliza a parte real para exibicao
         normalize(planos[0], planos[0], 0, 1, CV_MINMAX);
         imshow("filtrada", planos[0]);
@@ -160,5 +159,19 @@ int main(int , char**){
         key = (char) waitKey(10);
         if( key == 27 ) break; // esc pressed!
     }
+    // salvar img filtrada e filtro
+    Mat final;
+    planos[0].convertTo(final, CV_8UC1, 255.0);
+    imwrite("filtrada.png", final);
+    // mostra parte real do filtro
+    vector<Mat> pFiltro;
+    split(filter,pFiltro);
+    normalize(pFiltro[0], pFiltro[0], 0, 1, CV_MINMAX);
+
+    pFiltro[0].convertTo(final, CV_8UC1, 255.0);
+    imwrite("filtro.png", final);
+
+    waitKey(0);
+
     return 0;
 }
