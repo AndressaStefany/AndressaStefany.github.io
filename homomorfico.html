@@ -126,7 +126,7 @@ int</span><span class="keyword"> main</span><span class="operator">(</span><span
 </span>        merge<span class="operator">(</span>planos<span class="operator">,</span> complexImage<span class="operator">);</span><span class="comment">
 
         // calcula o dft
-</span>        dft<span class="operator">(</span>complexImage<span class="operator">,</span> complexImage<span class="operator">);</span><span class="comment">
+</span>        dft<span class="operator">(</span>complexImage<span class="operator">,</span> complexImage<span class="operator">,</span>DFT_SCALE<span class="operator">);</span><span class="comment">
 
         // realiza a troca de quadrantes
 </span>        deslocaDFT<span class="operator">(</span>complexImage<span class="operator">);</span><span class="comment">
@@ -138,7 +138,7 @@ int</span><span class="keyword"> main</span><span class="operator">(</span><span
 </span>        deslocaDFT<span class="operator">(</span>complexImage<span class="operator">);</span><span class="comment">
 
         // calcula a DFT inversa
-</span>        idft<span class="operator">(</span>complexImage<span class="operator">,</span> complexImage<span class="operator">);</span><span class="comment">
+</span>        idft<span class="operator">(</span>complexImage<span class="operator">,</span> complexImage<span class="operator">,</span>DFT_SCALE<span class="operator">);</span><span class="comment">
 
         // limpa o array de planos
 </span>        planos<span class="operator">.</span>clear<span class="operator">();</span><span class="comment">

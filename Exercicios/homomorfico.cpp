@@ -126,7 +126,7 @@ int main(int , char**){
         merge(planos, complexImage);
 
         // calcula o dft
-        dft(complexImage, complexImage);
+        dft(complexImage, complexImage,DFT_SCALE);
 
         // realiza a troca de quadrantes
         deslocaDFT(complexImage);
@@ -138,7 +138,7 @@ int main(int , char**){
         deslocaDFT(complexImage);
 
         // calcula a DFT inversa
-        idft(complexImage, complexImage);
+        idft(complexImage, complexImage,DFT_SCALE);
 
         // limpa o array de planos
         planos.clear();
