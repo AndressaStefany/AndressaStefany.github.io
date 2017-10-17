@@ -1,0 +1,106 @@
+<pre><span class="pre">#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+#include &lt;fstream&gt;
+#include &lt;iomanip&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;numeric&gt;
+#include &lt;ctime&gt;
+#include &lt;cstdlib&gt;
+</span><span class="keyword">
+using namespace</span> std<span class="operator">;</span><span class="keyword">
+using namespace</span> cv<span class="operator">;</span><span class="comment">
+// passo usado para varrer
+// a imagem de referência
+</span><span class="pre">#define STEP 2
+
+#define JITTER 2
+#define RAIO 3
+</span><span class="type">
+int</span><span class="keyword"> main</span><span class="operator">(</span><span class="type">int</span> argc<span class="operator">,</span><span class="type"> char</span><span class="operator">**</span> argv<span class="operator">){</span>
+    vector<span class="operator">&lt;</span><span class="type">int</span><span class="operator">&gt;</span> yrange<span class="operator">;</span>
+    vector<span class="operator">&lt;</span><span class="type">int</span><span class="operator">&gt;</span> xrange<span class="operator">;</span>
+
+    Mat image<span class="operator">,</span> frame<span class="operator">,</span> points<span class="operator">,</span> border<span class="operator">,</span> imageCanny<span class="operator">,</span> borrada<span class="operator">;</span>
+    Vec3b gray<span class="operator">;</span><span class="type">
+    int</span> width<span class="operator">,</span> height<span class="operator">;</span><span class="type">
+    int</span> x<span class="operator">,</span> y<span class="operator">;</span>
+
+    image<span class="operator">=</span> imread<span class="operator">(</span><span class="string">"../images/itapaje.jpg"</span><span class="operator">,</span>CV_LOAD_IMAGE_COLOR<span class="operator">);</span>
+
+    srand<span class="operator">(</span>time<span class="operator">(</span><span class="int">0</span><span class="operator">));</span><span class="flow">
+
+    if</span><span class="operator">(!</span>image<span class="operator">.</span>data<span class="operator">){</span>
+        cout<span class="operator"> &lt;&lt;</span><span class="string"> "nao abriu"</span><span class="operator"> &lt;&lt;</span> argv<span class="operator">[</span><span class="int">1</span><span class="operator">] &lt;&lt;</span> endl<span class="operator">;</span>
+        cout<span class="operator"> &lt;&lt;</span> argv<span class="operator">[</span><span class="int">0</span><span class="operator">] &lt;&lt;</span><span class="string"> " imagem.jpg"</span><span class="operator">;</span>
+        exit<span class="operator">(</span><span class="int">0</span><span class="operator">);
+    }</span>
+    width<span class="operator">=</span>image<span class="operator">.</span>size<span class="operator">().</span>width<span class="operator">;</span>
+    height<span class="operator">=</span>image<span class="operator">.</span>size<span class="operator">().</span>height<span class="operator">;</span>
+
+    xrange<span class="operator">.</span>resize<span class="operator">(</span>height<span class="operator">/</span>STEP<span class="operator">);</span>
+    yrange<span class="operator">.</span>resize<span class="operator">(</span>width<span class="operator">/</span>STEP<span class="operator">);</span>
+
+    iota<span class="operator">(</span>xrange<span class="operator">.</span>begin<span class="operator">(),</span> xrange<span class="operator">.</span>end<span class="operator">(),</span><span class="int"> 0</span><span class="operator">);</span>
+    iota<span class="operator">(</span>yrange<span class="operator">.</span>begin<span class="operator">(),</span> yrange<span class="operator">.</span>end<span class="operator">(),</span><span class="int"> 0</span><span class="operator">);</span><span class="flow">
+
+    for</span><span class="operator">(</span>uint i<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> i<span class="operator">&lt;</span>xrange<span class="operator">.</span>size<span class="operator">();</span> i<span class="operator">++){</span>
+        xrange<span class="operator">[</span>i<span class="operator">]=</span> xrange<span class="operator">[</span>i<span class="operator">]*</span>STEP<span class="operator">+</span>STEP<span class="operator">/</span><span class="int">2</span><span class="operator">;
+    }</span><span class="flow">
+
+    for</span><span class="operator">(</span>uint i<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> i<span class="operator">&lt;</span>yrange<span class="operator">.</span>size<span class="operator">();</span> i<span class="operator">++){</span>
+        yrange<span class="operator">[</span>i<span class="operator">]=</span> yrange<span class="operator">[</span>i<span class="operator">]*</span>STEP<span class="operator">+</span>STEP<span class="operator">/</span><span class="int">2</span><span class="operator">;
+    }</span>
+
+    points<span class="operator"> =</span> Mat<span class="operator">(</span>height<span class="operator">,</span> width<span class="operator">,</span> CV_8UC3<span class="operator">,</span> Scalar<span class="operator">(</span><span class="int">255</span><span class="operator">,</span><span class="int">255</span><span class="operator">,</span><span class="int">255</span><span class="operator">));</span><span class="comment">
+    //embaralha os elementos de xrange
+</span>    random_shuffle<span class="operator">(</span>xrange<span class="operator">.</span>begin<span class="operator">(),</span> xrange<span class="operator">.</span>end<span class="operator">());</span><span class="flow">
+
+    for</span><span class="operator">(</span><span class="keyword">auto</span> i<span class="operator"> :</span> xrange<span class="operator">){</span><span class="comment">
+        //embaralha os elementos de yrange
+</span>        random_shuffle<span class="operator">(</span>yrange<span class="operator">.</span>begin<span class="operator">(),</span> yrange<span class="operator">.</span>end<span class="operator">());</span><span class="flow">
+        for</span><span class="operator">(</span><span class="keyword">auto</span> j<span class="operator"> :</span> yrange<span class="operator">){</span><span class="comment">
+            // centro do circulo a
+            // ser desenhado
+</span>            x<span class="operator"> =</span> i<span class="operator">+</span>rand<span class="operator">()%(</span><span class="int">2</span><span class="operator">*</span>JITTER<span class="operator">)-</span>JITTER<span class="operator">+</span><span class="int">1</span><span class="operator">;</span>
+            y<span class="operator"> =</span> j<span class="operator">+</span>rand<span class="operator">()%(</span><span class="int">2</span><span class="operator">*</span>JITTER<span class="operator">)-</span>JITTER<span class="operator">+</span><span class="int">1</span><span class="operator">;</span>
+            gray<span class="operator"> =</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>Vec3b<span class="operator">&gt;(</span>x<span class="operator">,</span>y<span class="operator">);</span><span class="comment">
+            // traça um circulo
+</span>            circle<span class="operator">(</span>points<span class="operator">,</span>
+                   cv<span class="operator">::</span>Point<span class="operator">(</span>y<span class="operator">,</span>x<span class="operator">),</span>
+                   RAIO<span class="operator">,</span>
+                   CV_RGB<span class="operator">(</span>gray<span class="operator">[</span><span class="int">2</span><span class="operator">],</span>gray<span class="operator">[</span><span class="int">1</span><span class="operator">],</span>gray<span class="operator">[</span><span class="int">0</span><span class="operator">]),
+                   -</span><span class="int">1</span><span class="operator">,</span>
+                   CV_AA<span class="operator">);
+        }
+    }</span>
+    imwrite<span class="operator">(</span><span class="string">"semCanny.jpg"</span><span class="operator">,</span> points<span class="operator">);</span><span class="comment">
+
+    // convertendo a imagem para tons de cinza
+</span>    cvtColor<span class="operator">(</span>image<span class="operator">,</span> imageCanny<span class="operator">,</span> CV_BGR2GRAY<span class="operator">);</span><span class="comment">
+    // borrando
+</span>    GaussianBlur<span class="operator">(</span>imageCanny<span class="operator">,</span> borrada<span class="operator">,</span> Size<span class="operator">(</span><span class="int">3</span><span class="operator">,</span><span class="int">3</span><span class="operator">),</span><span class="int"> 25</span><span class="operator">,</span><span class="int"> 25</span><span class="operator">);</span><span class="comment">
+    // gerando a imagem canny
+</span>    Canny<span class="operator">(</span>borrada<span class="operator">,</span> border<span class="operator">,</span><span class="int"> 50</span><span class="operator">,</span><span class="int"> 3</span><span class="operator">*</span><span class="int">50</span><span class="operator">);</span>
+    imwrite<span class="operator">(</span><span class="string">"imageCanny.jpg"</span><span class="operator">,</span> border<span class="operator">);</span><span class="comment">
+
+    // percorrer toda a imagem e verificar
+    // os pontos de borda
+</span><span class="flow">    for</span><span class="operator">(</span><span class="type">int</span> i<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> i<span class="operator">&lt;</span>height<span class="operator">;</span> i<span class="operator">++){</span><span class="flow">
+        for</span><span class="operator">(</span><span class="type">int</span> j<span class="operator">=</span><span class="int">0</span><span class="operator">;</span> j<span class="operator">&lt;</span>width<span class="operator">;</span> j<span class="operator">++){</span>
+            gray<span class="operator"> =</span> image<span class="operator">.</span>at<span class="operator">&lt;</span>Vec3b<span class="operator">&gt;(</span>i<span class="operator">,</span>j<span class="operator">);</span><span class="flow">
+            if</span><span class="operator">(</span>border<span class="operator">.</span>at<span class="operator">&lt;</span>uchar<span class="operator">&gt;(</span>i<span class="operator">,</span>j<span class="operator">)==</span><span class="int">255</span><span class="operator">){</span>
+                circle<span class="operator">(</span>points<span class="operator">,</span>
+                       cv<span class="operator">::</span>Point<span class="operator">(</span>j<span class="operator">,</span>i<span class="operator">),</span><span class="int">
+                       1</span><span class="operator">,</span><span class="comment">//raio 1 nas bordas
+</span>                       CV_RGB<span class="operator">(</span>gray<span class="operator">[</span><span class="int">2</span><span class="operator">],</span>gray<span class="operator">[</span><span class="int">1</span><span class="operator">],</span>gray<span class="operator">[</span><span class="int">0</span><span class="operator">]),
+                       -</span><span class="int">1</span><span class="operator">,</span>
+                       CV_AA<span class="operator">);
+            }
+        }
+    }</span>
+    imwrite<span class="operator">(</span><span class="string">"comCanny.jpg"</span><span class="operator">,</span> points<span class="operator">);</span><span class="flow">
+
+    return</span><span class="int"> 0</span><span class="operator">;
+}</span>
+</pre>

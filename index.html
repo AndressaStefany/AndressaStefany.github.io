@@ -26,6 +26,8 @@
             $("#motiondetector").load("motiondetector.html");
             $("#tiltshift").load("tfoto.html");
             $("#tiltshiftvideo").load("tvideo.html");
+            $("#frequenciahtml").load("homomorfico.html");
+            $("#pontihtml").load("pontCanny.html");
         });
     </script>
 
@@ -74,6 +76,10 @@
                         <li><a href="#espacial2">Domínio Espacial II</a></li>
                         <li class="dropdown-header"><a href="#foto">Foto</a></li>
                         <li class="dropdown-header"><a href="#video">Vídeo</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#frequencia">Filtro Homomórfico</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#pontiCanny">Canny e Pontilhismo</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
@@ -289,48 +295,119 @@
         </video>
     </div>
 
-    <div class="figure">
-        <img src="images/separador.png" width="200">
-    </div>
-
-    <h2 id="sobre">Sobre</h2>
     <br>
-    <p>Esse site foi feito para apresentar os exercícios da disciplina de Processamento Digital
-        de Imagens da UFRN, propostos no seguinte site:
-        <a href="http://agostinhobritojr.github.io/"> link </a>,
-        fazendo uso do <a href="http://docs.opencv.org/2.4/">OpenCV</a>.</p>
-
-    <div class="figure">
-        <img src="images/separador.png" width="200">
-    </div>
-
-    <h2 id="contato">Contato</h2>
+    <h2 id="frequencia">Filtragem no Domínio da Frequência</h2>
+    <h2 class="blog-post-title">Filtro Homomórfico</h2>
     <br>
-    <p>Linkedin:
-        <a href="https://www.linkedin.com/in/andressa-st%C3%A9fany-01175263/">
-            Andressa Stéfany
-        </a>
-    </p>
-    <p>E-mail: astefanysoliveira@gmail.com</p>
+    <p>Utilizando o programa <a href="CódigosDoProfessor/dft.cpp">exemplos/dft.cpp</a> como referência, implemente o filtro homomórfico para melhorar imagens com iluminação
+        irregular. Crie uma cena mal iluminada e ajuste os parâmetros do filtro homomórfico para corrigir a iluminação da melhor forma
+        possível. Assuma que a imagem fornecida é em tons de cinza.</p>
 
-    <div class="figure">
-        <img src="images/separador.png" width="200">
+    <br>
+    <div id="frequenciahtml"></div>
+    <br>
+    <p>Resultado:</p>
+    <ul>
+        <li>Utilizando Gamma H = 3.8, Gamma L = 0.2, d0 = 2.1 e c = 0.013</li>
+        <br>
+        <img class="img-responsive" src="images/homo1.png" width="1000px">
+
+        <br>
+        <li>Utilizando Gamma H = 2.0, Gamma L = 0, d0 = 2.1 e c = 0.006</li>
+        <br>
+        <img class="img-responsive" src="images/homo2.png" width="1000px">
+    </ul>
+
+    <br>
+    <h2 id="pontiCanny">Filtro Canny e Pontilhismo</h2>
+    <h2 class="blog-post-title">Canny e a Arte com Pontilhismo</h2>
+    <br>
+    <p>Utilizando os programas <a href="CódigosDoProfessor/canny.cpp">exemplos/canny.cpp</a> e
+        <a href="CódigosDoProfessor/pontilhismo.cpp">exemplos/pontilhismo.cpp</a> como referência, implemente um programa
+        <i>cannypoints.cpp</i>. A idéia é usar as bordas produzidas pelo algoritmo de Canny para melhorar a qualidade da imagem
+        pontilhista gerada. A forma como a informação de borda será usada é livre.</p>
+    <p><b>Estratégia:</b> Primeiro, foi gerada a imagem utilizando o mesmo efeito do código
+        <a href="CódigosDoProfessor/pontilhismo.cpp">
+        pontilhismo.cpp</a>. Em seguida, foi gerada uma imagem usando o filtro Canny, dessa forma,
+        obteve-se os pontos que representam bordas na imagem, com isso, a imagem obtida através do Canny
+        foi percorrida novamente para se ter conhecimento da localização dos pontos de borda e, posteriormente,
+        esses pontos foram pintados mais uma vez na imagem gerada anteriormente pelo pontilhismo, porém, foi
+        utilizado raio 1, fazendo com que os detalhes da imagem pudessem ser realçados.</p>
+
+    <br>
+    <div id="pontihtml"></div>
+    <br>
+    <p>Resultado:</p>
+    <br>
+    <div class="row">
+        <div class="col-lg-12 col-xs-12 top-padding2">
+            <div class="col-lg-6 col-xs-12">
+                <p>Imagem original:</p>
+                <img class="img-responsive" src="images/itapaje.jpg" height="1000px">
+            </div>
+            <div class="col-lg-6 col-xs-12">
+                <p>Apenas com o Canny:</p>
+                <img class="img-responsive" src="images/imageCanny.jpg" height="1000px">
+            </div>
+        </div>
+
+        <div class="col-lg-12 col-xs-12 top-padding2">
+            <div class="col-lg-6 col-xs-12">
+                <p>Utilizando pontilhismo.cpp:</p>
+                <img class="img-responsive" src="images/semCanny.jpg" height="1000px">
+            </div>
+            <div class="col-lg-6 col-xs-12">
+                <p>Pontilhismo com o Canny:</p>
+                <img class="img-responsive" src="images/comCanny.jpg" height="1000px">
+            </div>
+            <div class="col-lg-12 col-xs-12">
+                <p class="top-padding2" style="color: #8c8c8c">*Local: Itapajé-CE.</p>
+            </div>
+        </div>
+        <div class="figure">
+            <img src="images/separador.png" width="200">
+        </div>
+
+        <h2 id="sobre">Sobre</h2>
+        <br>
+        <p>Esse site foi feito para apresentar os exercícios da disciplina de Processamento Digital
+            de Imagens da UFRN, propostos no seguinte site:
+            <a href="http://agostinhobritojr.github.io/"> link </a>,
+            fazendo uso do <a href="http://docs.opencv.org/2.4/">OpenCV</a>.</p>
+
+        <div class="figure">
+            <img src="images/separador.png" width="200">
+        </div>
+
+        <h2 id="contato">Contato</h2>
+        <br>
+        <p>Linkedin:
+            <a href="https://www.linkedin.com/in/andressa-st%C3%A9fany-01175263/">
+                Andressa Stéfany
+            </a>
+        </p>
+        <p>E-mail: astefanysoliveira@gmail.com</p>
+
+        <div class="figure">
+            <img src="images/separador.png" width="200">
+        </div>
+
+        <div class="footer things-center" style="padding-top:3%; padding-bottom: 3%">
+            PDI © 2017 <br>
+            <a href="http://getbootstrap.com/">Bootstrap</a> |
+            <a href="http://www.freepik.com">Freepik</a>
+        </div>
+
+
     </div>
-
-    <div class="footer things-center" style="padding-top:3%; padding-bottom: 3%">
-        PDI © 2017 <br>
-        <a href="http://getbootstrap.com/">Bootstrap</a> |
-        <a href="http://www.freepik.com">Freepik</a>
-    </div>
+</div><!-- /container -->
 
 
-</div> <!-- /container -->
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="./bootstrap/docs/dist/js/bootstrap.min.js"></script>
 
-
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="./bootstrap/docs/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
