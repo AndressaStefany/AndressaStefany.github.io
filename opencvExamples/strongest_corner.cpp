@@ -18,15 +18,15 @@ int main(int argc, char** argv){
 
     image = imread("../images/itapaje.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 
-    //image, corners, maxCorners, qualityLevel, minDistance, mask, blockSize, useHarrisDetector, k
+    // image, corners, maxCorners, qualityLevel, minDistance, mask, blockSize, useHarrisDetector, k
     goodFeaturesToTrack( image, corners, 50, 0.01, 20, mask, 3, false, 0.04 );
 
     for( size_t i = 0; i < corners.size(); i++ )
-    {//pinta os cantos de bordas forte
-        //image, center, radius, color, thickness=1, lineType=8, shift=0
+    {// pinta os cantos de bordas forte
+        // image, center, radius, color, thickness=1, lineType=8, shift=0
         circle( image, corners[i], 3, Scalar( 255. ), -1 );
     }
-    //mostra
+    // mostra
     imshow("window", image);
 
     waitKey(0);
