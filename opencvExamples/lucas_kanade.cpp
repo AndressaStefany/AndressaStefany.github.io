@@ -42,7 +42,7 @@ int main(int argc, char** argv){
 
     while(1) {
         // verifica se eh o primeiro loop
-        if(!cap2.empty()) {
+        if(!cap2.empty()) {//ver se precisa dessa largura e altura
             // pega largura e altura da imagem
             width = cap1.size().width;
             height = cap1.size().height;
@@ -59,7 +59,6 @@ int main(int argc, char** argv){
         // atualiza image
         image = cap2.clone();
         // converte para gray
-
         cvtColor(cap2, cap2, CV_BGR2GRAY);
 
         // acha os pontos usando Lucas Kanade
