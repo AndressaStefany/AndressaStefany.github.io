@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <vector>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -45,6 +46,8 @@ int main(int argc, char** argv){
     // deslocamento e media de deslocamento
     CvPoint desl, mediaDesl;
 
+    CvPoint pt1, pt2;
+
     // prev_image eh a imagem anterior
     // next_image a imagem seguinte a ser comparada
     // image eh a imagem a ser pintada com os pontos
@@ -52,7 +55,7 @@ int main(int argc, char** argv){
     // image_cut imagem cortada
     Mat prev_image, next_image, image, mask, image_cut, teste;
     // vetor que guarda as bordas
-    vector<Point2f> corners[2];
+    vector<Point2f> corners[2], greatCorners[2];
     // status, err, winSize e termcrit usados em calcOpticalFlowPyrLK
     vector<uchar> status;
     vector<float> err;
@@ -78,15 +81,18 @@ int main(int argc, char** argv){
     // corta a imagem com o pad especificado
     prev_image = prev_image(Rect(pad, pad, tamY-pad*2, tamX-pad*2)).clone();
 
-    // pega pontos de bordas fortes
-    // metodo de Shi-Tomasi
-    goodFeaturesToTrack(prev_image, corners[0], 50, 0.01, 20, mask, 3, false, 0.04);
 
     while(1){
+
         if(!next_image.empty()) {
             // atualiza prev_image
             prev_image = next_image.clone();
         }
+
+        // pega pontos de bordas fortes
+        // metodo de Shi-Tomasi
+        goodFeaturesToTrack(prev_image, corners[0], 300, 0.01, 20, mask, 3, false, 0.04);
+
         // pega o segundo frame para comparaçao
         // capturar 3 frames acelera o video
         cap >> next_image;
@@ -111,22 +117,34 @@ int main(int argc, char** argv){
         // metodo do Lucas Kanade
         calcOpticalFlowPyrLK(prev_image, next_image, corners[0], corners[1], status, err,
                              winSize, 3, termcrit,0, 0.001);
+
+        // tirando os ruins
+        for(size_t i=0; i < status.size(); i++) {
+            if(status[i]) {
+                greatCorners[0].push_back(corners[0][i]);
+                greatCorners[1].push_back(corners[1][i]);
+            }
+        }
+        corners[0].clear();
+        corners[1].clear();
+
         // garante que o desl eh inicialmente zero
         desl.x = 0;
         desl.y = 0;
 
-        for (size_t i = 0; i < corners[1].size(); i++) {
+        for (size_t i = 0; i < greatCorners[1].size(); i++) {
             //soma dos deslocamentos entre os pontos
-            desl = soma(deslocamento(corners[0][i],corners[1][i]), desl);
+            desl = soma(deslocamento(greatCorners[0][i],greatCorners[1][i]), desl);
             // pinta os pontos em image
-            circle(image, corners[0][i], 3, cor, -1, 8);
-            circle(image, corners[1][i], 3, Scalar(255, 0, 0), -1, 8);
+//            circle(image, greatCorners[0][i], 3, cor, -1, 8);
+//            circle(image, greatCorners[1][i], 3, Scalar(255, 0, 0), -1, 8);
             // atualiza os pontos
-//            corners[0][i] = corners[1][i];
+//            greatCorners[0][i] = greatCorners[1][i];
         }
         //media do deslocamento
-        mediaDesl = media(desl, corners[1].size());
-//        cout<<mediaDesl.x<<" , "<<mediaDesl.y<<endl;
+        mediaDesl = media(desl, greatCorners[1].size());
+        cout<<mediaDesl.x<<" , "<<mediaDesl.y<<endl;
+
         if(mediaDesl.x>pad)
             mediaDesl.x = pad;
 
@@ -136,14 +154,15 @@ int main(int argc, char** argv){
         cout<<"pad - mediaDesY: "<<pad - mediaDesl.y<<"    pad - mediaDesX: "<<pad - mediaDesl.x<<endl;
         cout<<"largura: "<<tamY-pad*2<<"    altura: "<<tamX-pad*2<<endl<<endl;
 
-        teste = image_cut(Rect(pad - mediaDesl.y,pad - mediaDesl.x, tamY-pad*2, tamX-pad*2)).clone();
+//        teste = image_cut(Rect(pad - mediaDesl.y,pad - mediaDesl.x, tamY-pad*2, tamX-pad*2)).clone();
+        teste = image_cut.clone();
+        pt1.x = pad-mediaDesl.y;
+        pt1.y = pad-mediaDesl.x;
 
-        for (size_t i = 0; i < corners[1].size(); i++) {
-            // pinta os pontos em image
-            circle(teste, corners[1][i], 3, Scalar(0, 0, 255), -1, 8);
-            circle(teste, corners[0][i], 3, Scalar(255, 0, 0), -1, 8);
-            corners[0][i] = corners[1][i];//temporario
-        }
+        pt2.x = pad-mediaDesl.y+tamY-pad*2;
+        pt2.y = pad-mediaDesl.x+tamX-pad*2;
+
+        rectangle(teste, pt1, pt2, Scalar(255,0,0),1,8,0);
 
         imshow("window", image);
         imshow("teste", teste);
