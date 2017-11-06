@@ -127,11 +127,11 @@ int main(int argc, char** argv){
         //media do deslocamento
         mediaDesl = media(desl, corners[1].size());
 //        cout<<mediaDesl.x<<" , "<<mediaDesl.y<<endl;
-//        if(mediaDesl.x>60)
-//            mediaDesl.x = 60;
-//
-//        if(mediaDesl.y>60)
-//            mediaDesl.y = 60;
+        if(mediaDesl.x>pad)
+            mediaDesl.x = pad;
+
+        if(mediaDesl.y>pad)
+            mediaDesl.y = pad;
 
         cout<<"pad - mediaDesY: "<<pad - mediaDesl.y<<"    pad - mediaDesX: "<<pad - mediaDesl.x<<endl;
         cout<<"largura: "<<tamY-pad*2<<"    altura: "<<tamX-pad*2<<endl<<endl;
@@ -162,8 +162,6 @@ int main(int argc, char** argv){
     }
 //    videoResult2.release();
 //    imwrite("blended.jpg",blended);
-    string x =getBuildInformation();
-    cout << x << endl;
 
     return 0;
 }
