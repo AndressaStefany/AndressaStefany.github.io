@@ -1,186 +1,113 @@
 /*
  * Hyperlapse
  */
-
 #include <iostream>
-#include <vector>
 #include <opencv2/opencv.hpp>
 
-using namespace cv;
 using namespace std;
+using namespace cv;
 
-float distancia(CvPoint pt1, CvPoint pt2) {
-    int dx = pt2.x - pt1.x;
-    int dy = pt2.y - pt1.y;
-    return cvSqrt( (float)(dx*dx + dy*dy));
-}
+int main() {
+    VideoCapture cap("hipo.mp4");
 
-CvPoint deslocamento(CvPoint pt1, CvPoint pt2) {
-    CvPoint dR;
-    dR.x = (int) pt2.x - pt1.x;
-    dR.y = (int) pt2.y - pt1.y;
-
-    return dR;
-}
-
-CvPoint soma(CvPoint pt1, CvPoint pt2) {
-    CvPoint dR;
-    dR.x = (int) pt1.x + pt2.x;
-    dR.y = (int) pt1.y + pt2.y;
-
-    return dR;
-}
-
-CvPoint media(CvPoint pt, int tam) {
-    CvPoint dR;
-    dR.x = (int) pt.x / tam;
-    dR.y = (int) pt.y / tam;
-
-    return dR;
-}
-
-int main(int argc, char** argv){
-    char key;
-    // tamY e tamX eh o tamanho da imagem
-    int cont = 0, pad = 40, tamY = 768, tamX = 432;
-    // deslocamento e media de deslocamento
-    CvPoint desl, mediaDesl;
-
-    CvPoint pt1, pt2;
-
-    // prev_image eh a imagem anterior
-    // next_image a imagem seguinte a ser comparada
-    // image eh a imagem a ser pintada com os pontos
-    // mask eh usada em goodFeaturesToTrack
-    // image_cut imagem cortada
-    Mat prev_image, next_image, image, mask, image_cut, teste;
-    // vetor que guarda as bordas
+    Mat prev_image, next_image, image_color, image_new, mask, prevT;
     vector<Point2f> corners[2], greatCorners[2];
-    // status, err, winSize e termcrit usados em calcOpticalFlowPyrLK
+
     vector<uchar> status;
     vector<float> err;
     Size winSize(31,31);
-    TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS,20,0.03);
+    TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS,30,0.01);
 
-//    VideoWriter videoResult2;
-//    videoResult2.open("videoResult2.avi", CV_FOURCC('M','J','P','G'), 15, Size(tamY,tamX));
+    cap>>prev_image;
+    cvtColor(prev_image, prev_image, COLOR_BGR2GRAY);
 
-    // cor dos pontos
-    Scalar cor = Scalar(0, 255, 0);
+    double dx=0, dy=0, da=0;
+    while(1)
+    {
+        cap>>next_image;
 
-    VideoCapture cap("../videoCurto2.mp4");
-    // pega primeiro frame
-    cap >> prev_image;
-    resize(prev_image,prev_image,Size(tamY,tamX));
-
-    image = prev_image.clone();
-
-    // converte prev_image para gray color
-    cvtColor(prev_image, prev_image, CV_BGR2GRAY);
-
-    // corta a imagem com o pad especificado
-    prev_image = prev_image(Rect(pad, pad, tamY-pad*2, tamX-pad*2)).clone();
-
-
-    while(1){
-
-        if(!next_image.empty()) {
-            // atualiza prev_image
-            prev_image = next_image.clone();
+        if(next_image.data==NULL) {
+            break;
         }
 
-        // pega pontos de bordas fortes
-        // metodo de Shi-Tomasi
-        goodFeaturesToTrack(prev_image, corners[0], 300, 0.01, 20, mask, 3, false, 0.04);
+        image_color = next_image.clone();
 
-        // pega o segundo frame para comparaçao
-        // capturar 3 frames acelera o video
-        cap >> next_image;
-        if (next_image.empty())
-            break;
-//        cap >> next_image;
-//        if (next_image.empty())
-//            break;
-//        cap >> next_image;
-//        if (next_image.empty())
-//            break;
+        cvtColor(next_image, next_image, COLOR_BGR2GRAY);
 
-        resize(next_image,next_image,Size(tamY,tamX));
-
-        image = next_image.clone();
-        image_cut = next_image.clone();
-        // corta a imagem com o pad especificado
-        next_image = next_image(Rect(pad, pad, tamY-pad*2, tamX-pad*2)).clone();
-        // converte next_image para gray color
-        cvtColor(next_image, next_image, CV_BGR2GRAY);
-
-        // metodo do Lucas Kanade
+        goodFeaturesToTrack(prev_image, corners[0], 300, 0.01, 20, mask, 3, false, 0.01);
         calcOpticalFlowPyrLK(prev_image, next_image, corners[0], corners[1], status, err,
-                             winSize, 3, termcrit,0, 0.001);
+                             winSize, 3, termcrit, 0, 0.001);
 
-        // tirando os ruins
         for(size_t i=0; i < status.size(); i++) {
             if(status[i]) {
                 greatCorners[0].push_back(corners[0][i]);
                 greatCorners[1].push_back(corners[1][i]);
             }
         }
+
+        for(int i=0; i<greatCorners[0].size(); i++)
+        {
+            circle(prev_image,greatCorners[0][i],3,Scalar(255));
+            circle(image_color,greatCorners[1][i],3,Scalar(0,255,0));
+        }
+
+        imshow("janela1", prev_image);
+        imshow("janela2", image_color);
+
+        Mat T = estimateRigidTransform(greatCorners[1], greatCorners[0], false);
+
+        static double maxE= 5, last_dx, last_dy, last_da
+        ,soma_dx=0,soma_dy=0,soma_da=0,
+                sx=0, sy=0, sa=0;
+
+        if(T.data==NULL){
+            T= Mat(Size(3,2),CV_32FC1, Scalar(0));
+            T(Range(0,2),Range(0,2))= Mat::eye(2,2,CV_32FC1);
+            cout << "Perdeu" << endl;
+        }
+        else
+        {
+            soma_dx+= T.at<double>(0,2);
+            soma_dy+= T.at<double>(1,2);
+            soma_da+= atan2(T.at<double>(1,0), T.at<double>(0,0));
+        }
+        prev_image= next_image.clone();
+        prevT= T.clone();
+
+        dx= soma_dx;
+        dy= soma_dy;
+        da= soma_da;
+
+        T.at<double>(0,0) = cos(da);
+        T.at<double>(0,1) = -sin(da);
+        T.at<double>(1,0) = sin(da);
+        T.at<double>(1,1) = cos(da);
+
+        T.at<double>(0,2) = dx;
+        T.at<double>(1,2) = dy;
+
+//        Mat T = findHomography(greatCorners[1], greatCorners[0]);
+
+        warpAffine(image_color, image_new, T, image_color.size());
+//        warpPerspective(image_color, image_new, T, next_image.size());
+
+        const int HORIZONTAL_BORDER_CROP = 40;
+        int vert_border = HORIZONTAL_BORDER_CROP * prev_image.rows/prev_image.cols;
+        image_new= image_new(Range(vert_border, image_new.rows-vert_border),
+                             Range(HORIZONTAL_BORDER_CROP, image_new.cols-HORIZONTAL_BORDER_CROP));
+
+        resize(image_new,image_new,image_color.size());
+        imshow("janela3", image_new);
+
+//        waitKey(0);
+        if (waitKey(30)!=-1)
+            break;
+
+        greatCorners[0].clear();
+        greatCorners[1].clear();
         corners[0].clear();
         corners[1].clear();
-
-        // garante que o desl eh inicialmente zero
-        desl.x = 0;
-        desl.y = 0;
-
-        for (size_t i = 0; i < greatCorners[1].size(); i++) {
-            //soma dos deslocamentos entre os pontos
-            desl = soma(deslocamento(greatCorners[0][i],greatCorners[1][i]), desl);
-            // pinta os pontos em image
-//            circle(image, greatCorners[0][i], 3, cor, -1, 8);
-//            circle(image, greatCorners[1][i], 3, Scalar(255, 0, 0), -1, 8);
-            // atualiza os pontos
-//            greatCorners[0][i] = greatCorners[1][i];
-        }
-        //media do deslocamento
-        mediaDesl = media(desl, greatCorners[1].size());
-        cout<<mediaDesl.x<<" , "<<mediaDesl.y<<endl;
-
-        if(mediaDesl.x>pad)
-            mediaDesl.x = pad;
-
-        if(mediaDesl.y>pad)
-            mediaDesl.y = pad;
-
-        cout<<"pad - mediaDesY: "<<pad - mediaDesl.y<<"    pad - mediaDesX: "<<pad - mediaDesl.x<<endl;
-        cout<<"largura: "<<tamY-pad*2<<"    altura: "<<tamX-pad*2<<endl<<endl;
-
-//        teste = image_cut(Rect(pad - mediaDesl.y,pad - mediaDesl.x, tamY-pad*2, tamX-pad*2)).clone();
-        teste = image_cut.clone();
-        pt1.x = pad-mediaDesl.y;
-        pt1.y = pad-mediaDesl.x;
-
-        pt2.x = pad-mediaDesl.y+tamY-pad*2;
-        pt2.y = pad-mediaDesl.x+tamX-pad*2;
-
-        rectangle(teste, pt1, pt2, Scalar(255,0,0),1,8,0);
-
-        imshow("window", image);
-        imshow("teste", teste);
-
-//        videoResult2 << image;
-
-        key = (char) waitKey(10);
-        if( key == 27 ) break; // esc pressed!
-
-//        cont++;
-//        if(cont==100){// acha novos pontos de bordas
-//            goodFeaturesToTrack(next_image, corners[0], 50, 0.01, 20, mask, 3, false, 0.04);
-//            cont = 0;
-//        }
-
     }
-//    videoResult2.release();
-//    imwrite("blended.jpg",blended);
 
     return 0;
 }
