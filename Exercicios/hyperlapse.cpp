@@ -8,7 +8,7 @@ using namespace std;
 using namespace cv;
 
 int main() {
-    VideoCapture cap("hipo.mp4");
+    VideoCapture cap("../hipo.mp4");
 
     Mat prev_image, next_image, image_color, image_new, mask, prevT;
     vector<Point2f> corners[2], greatCorners[2];
@@ -25,7 +25,16 @@ int main() {
     while(1)
     {
         cap>>next_image;
+        if(next_image.data==NULL) {
+            break;
+        }
 
+        cap>>next_image;
+        if(next_image.data==NULL) {
+            break;
+        }
+
+        cap>>next_image;
         if(next_image.data==NULL) {
             break;
         }
@@ -45,20 +54,18 @@ int main() {
             }
         }
 
-        for(int i=0; i<greatCorners[0].size(); i++)
-        {
-            circle(prev_image,greatCorners[0][i],3,Scalar(255));
-            circle(image_color,greatCorners[1][i],3,Scalar(0,255,0));
-        }
+//        for(int i=0; i<greatCorners[0].size(); i++)
+//        {
+//            circle(prev_image,greatCorners[0][i],3,Scalar(255));
+//            circle(image_color,greatCorners[1][i],3,Scalar(0,255,0));
+//        }
 
         imshow("janela1", prev_image);
         imshow("janela2", image_color);
 
         Mat T = estimateRigidTransform(greatCorners[1], greatCorners[0], false);
 
-        static double maxE= 5, last_dx, last_dy, last_da
-        ,soma_dx=0,soma_dy=0,soma_da=0,
-                sx=0, sy=0, sa=0;
+        static double soma_dx=0,soma_dy=0,soma_da=0;
 
         if(T.data==NULL){
             T= Mat(Size(3,2),CV_32FC1, Scalar(0));
