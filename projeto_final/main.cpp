@@ -3,14 +3,28 @@
  */
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include "opencv2/highgui/highgui.hpp"
 
 using namespace std;
 using namespace cv;
 
+Mat image_color, prev_image;
+vector<Point2f> points;
+int cont=0;
+
+void CallBackFunc(int event, int x, int y, int flags, void* userdata) {
+    if (event == EVENT_LBUTTONDOWN) {
+        points.push_back(Point2f(x, y));
+        cout <<"("<<x<<","<<y<<")"<<endl;
+//        circle(image_color,points[cont],3,Scalar(0,255,0));
+//        cont++;
+    }
+}
+
 int main() {
     VideoCapture cap("../hipo.mp4");
 
-    Mat prev_image, next_image, image_color, image_new, mask, prevT;
+    Mat next_image, image_new, mask, prevT;
     vector<Point2f> corners[2], greatCorners[2];
 
     vector<uchar> status;
@@ -19,6 +33,14 @@ int main() {
     TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS,30,0.01);
 
     cap>>prev_image;
+    image_color = prev_image.clone();
+    imshow("janela2", image_color);
+
+    // escolha os pontos de referencia
+    // aperte uma tecla pra continuar
+    setMouseCallback("janela2", CallBackFunc, NULL);
+    waitKey();
+
     cvtColor(prev_image, prev_image, COLOR_BGR2GRAY);
 
     double dx=0, dy=0, da=0;
