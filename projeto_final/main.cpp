@@ -13,6 +13,7 @@ vector<Point2f> points;
 int cont=0;
 
 int main() {
+    bool refaz = false;
     VideoCapture cap("../videoCurto2.mp4");
 
     Mat next_image, image_new, mask, prevT;
@@ -58,6 +59,25 @@ int main() {
 
         cvtColor(next_image, next_image, COLOR_BGR2GRAY);
 
+        if(refaz){
+            corners_extra.clear();
+            corners[0].clear();
+
+            prev_image = image_new.clone();
+            cvtColor(prev_image, prev_image, COLOR_BGR2GRAY);
+
+            goodFeaturesToTrack(prev_image, corners_extra, 300, 0.01, 20, mask, 3, false, 0.01);
+
+            for (int i = 0; i < corners_extra.size(); i++) {
+                if (corners_extra[i].x >= 200 && corners_extra[i].y >= 150 && corners_extra[i].x <= 400
+                    && corners_extra[i].y <= 350) {
+                    corners[0].push_back(corners_extra[i]);
+                }
+            }
+
+            refaz = false;
+        }
+
 //        goodFeaturesToTrack(prev_image, corners[0], 300, 0.01, 20, mask, 3, false, 0.01);
         calcOpticalFlowPyrLK(prev_image, next_image, corners[0], corners[1], status, err,
                              winSize, 3, termcrit, 0, 0.001);
@@ -88,6 +108,7 @@ int main() {
             T= Mat(Size(3,2),CV_32FC1, Scalar(0));
             T(Range(0,2),Range(0,2))= Mat::eye(2,2,CV_32FC1);
             cout << "Perdeu" << endl;
+            refaz = true;
         }
         else
         {
